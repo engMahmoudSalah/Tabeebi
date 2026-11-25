@@ -32,7 +32,10 @@ export const monthName = (d) => new Date(d + "T12:00:00Z").toLocaleDateString(S.
 export const fmtDate = (d) => new Date(d + "T12:00:00Z").toLocaleDateString(S.lang === "ar" ? "ar-EG" : "en-US", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
 export const fmtTime = (t) => { const [H, M] = t.split(":").map(Number); const pm = H >= 12; const hh = H % 12 || 12; return `${num(hh)}:${String(M).padStart(2, "0").replace(/\d/g, (x) => (S.lang === "ar" ? "٠١٢٣٤٥٦٧٨٩"[x] : x))} ${pm ? T("م", "PM") : T("ص", "AM")}`; };
 export const stars = (n) => `<span class="rate">${ic("star")}${num(n)}</span>`;
-export const avatar = (d, cls = "") => { const ini = (S.lang === "ar" ? d.name_ar.replace(/^د\.?\s*/, "") : d.name_en.replace(/^Dr\.?\s*/, "")).split(" ")[0].slice(0, 1); return `<div class="av ${cls}" style="background:linear-gradient(140deg,hsl(${d.hue} 55% 42%),hsl(${(d.hue + 50) % 360} 60% 32%))">${h(ini)}</div>`; };
+const SKIN=["#f1c9a5","#e0ac84","#c68a5e","#a86f48"],HAIR=["#1d1a1a","#3a2a20","#5b4636","#2a2f3a"];
+export const avatar = (d, cls = "") => { const k = d.hue % 4, sk = SKIN[k], hr = HAIR[(d.hue >> 2) % 4], f = d.female, id = "g" + d.slug.replace(/[^a-z0-9]/g, "").slice(0, 12);
+  const hair = f ? `<path d="M30 46c-2-22 10-30 20-30s22 8 20 30c0 14 4 22 2 30-6-4-8-14-8-22H36c0 8-2 18-8 22-2-8 2-16 2-30z" fill="${hr}"/>` : `<path d="M32 44c-1-18 8-26 18-26s19 8 18 26c-4-8-10-12-18-12s-14 4-18 12z" fill="${hr}"/>`;
+  return `<div class="av ${cls}" style="background:linear-gradient(140deg,hsl(${d.hue} 55% 42%),hsl(${(d.hue + 50) % 360} 60% 32%))"><svg viewBox="0 0 100 100" role="img" aria-label="${h(d.name_en)}"><defs><clipPath id="${id}"><rect width="100" height="100"/></clipPath></defs><g clip-path="url(#${id})">${f ? hair : ""}<path d="M14 104c2-20 16-26 36-26s34 6 36 26z" fill="#f4f7f6"/><path d="M42 78l8 14 8-14" fill="none" stroke="#c9d5d1" stroke-width="2"/><path d="M36 80c-2 10 2 18 8 20M64 80c2 10-2 18-8 20" fill="none" stroke="#2c3b36" stroke-width="2.4" stroke-linecap="round"/><circle cx="44" cy="101" r="2.6" fill="#62d8b3"/><rect x="43" y="64" width="14" height="16" rx="6" fill="${sk}"/><ellipse cx="50" cy="48" rx="15.5" ry="18" fill="${sk}"/>${f ? "" : ""}${f ? `<path d="M34 44c4-9 12-12 16-12s12 3 16 12c-6-4-10-5-16-5s-10 1-16 5z" fill="${hr}"/>` : hair}<circle cx="44" cy="49" r="1.6" fill="#2a1d17"/><circle cx="56" cy="49" r="1.6" fill="#2a1d17"/><path d="M45 57c3 3 7 3 10 0" fill="none" stroke="#7a4a35" stroke-width="1.8" stroke-linecap="round"/></g></svg></div>`; };
 export const specName = (id) => { const s = S.meta?.specialties.find((x) => x.id === id); return s ? (S.lang === "ar" ? s.name_ar : s.name_en) : id; };
 export const dname = (d) => (S.lang === "ar" ? d.name_ar : d.name_en);
 
@@ -57,6 +60,7 @@ export async function render() {
   if (!S.meta) { try { S.meta = await api("/meta"); } catch {} }
   document.documentElement.lang = S.lang; document.documentElement.dir = S.lang === "ar" ? "rtl" : "ltr"; document.documentElement.dataset.theme = S.theme;
   $("#hdr").innerHTML = header(path); $("#ftr").innerHTML = footer();
+  setTimeout(reveal, 60);
   for (const [re, fn] of routes) { const m = path.match(re); if (m) { app.innerHTML = `<div class="wrap" style="padding-block:40px"><div class="grid"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div></div>`; try { await fn(app, m, new URLSearchParams(location.search)); } catch (e) { if (id === rendering) app.innerHTML = `<div class="wrap"><div class="empty">${ic("info")}<p>${h(e.message || "")}</p><a class="btn" style="margin-top:14px" href="/" data-link>${T("الرئيسية", "Home")}</a></div></div>`; } return; } }
   app.innerHTML = `<div class="wrap"><div class="empty">${ic("info")}<p>${T("الصفحة غير موجودة", "Page not found")}</p><a class="btn" style="margin-top:14px" href="/" data-link>${T("الرئيسية", "Home")}</a></div></div>`;
 }
@@ -95,3 +99,14 @@ document.addEventListener("click", async (e) => {
   }
 });
 window.addEventListener("popstate", render);
+
+const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+export function reveal() {
+  const sel = ".spec,.dc,.step,.box,.plan,.byc,.kpi,.cta,.stats>div";
+  const run = () => { const els = $$(sel).filter((e) => !e.dataset.rv); if (RM || !("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver((es) => es.forEach((x) => { if (x.isIntersecting) { x.target.classList.add("in"); io.unobserve(x.target); } }), { rootMargin: "0px 0px -6% 0px" });
+    els.forEach((e, i) => { e.dataset.rv = 1; e.classList.add("rv"); e.style.transitionDelay = (i % 6) * 40 + "ms"; io.observe(e); }); };
+  run(); new MutationObserver(() => { clearTimeout(reveal.t); reveal.t = setTimeout(run, 80); }).observe($("#app"), { childList: true });
+}
+export function countUp(el) { if (RM) return; const to = +el.dataset.to; const t0 = performance.now(); const f = (t) => { const p = Math.min(1, (t - t0) / 1200); el.textContent = num(Math.round(to * (1 - Math.pow(1 - p, 3)))) + (el.dataset.suf || ""); if (p < 1) requestAnimationFrame(f); }; requestAnimationFrame(f); }
+export const helix = () => `<div class="helix" aria-hidden="true">${Array.from({ length: 18 }, (_, i) => `<div class="hr" style="top:${i * 5.2}%;animation-delay:${-i * 0.22}s"><i class="a" style="animation-delay:${-i * 0.22}s"></i><i class="b" style="animation-delay:${-i * 0.22 - 1.6}s"></i><u style="animation-delay:${-i * 0.22}s"></u></div>`).join("")}</div>`;
