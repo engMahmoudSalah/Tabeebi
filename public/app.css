@@ -377,3 +377,5 @@ html,body{overflow-x:clip}
 .auth>.box{position:relative;z-index:1}
 .sp-stats{display:flex;gap:28px;margin-top:26px;flex-wrap:wrap}.sp-stats b{display:block;font-size:26px;line-height:1.2}.sp-stats span{color:var(--mute);font-size:13px}
 html,body{overflow-x:clip}
+.auth>.steth{inset-block-start:30px;inset-inline-end:-170px;width:150px}
+@media(max-width:900px){.auth>.steth{display:none}}
