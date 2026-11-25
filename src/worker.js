@@ -23,7 +23,8 @@ export default {
       const id = env.HUB.idFromName("main");
       const r = await env.HUB.get(id).fetch(new Request(SITE + "/api/slugs"));
       const slugs = await r.json();
-      const urls = ["/", "/doctors", "/for-doctors", "/plans", "/faq", "/by-mahmoud", ...slugs.map((s) => "/doctor/" + s)];
+      const sp = await (await env.HUB.get(env.HUB.idFromName("main")).fetch(new Request(SITE + "/api/meta"))).json();
+      const urls = ["/", ...sp.specialties.map((s) => "/specialty/" + s.id), "/doctors", "/for-doctors", "/plans", "/faq", "/by-mahmoud", ...slugs.map((s) => "/doctor/" + s)];
       return new Response(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map((u) => `<url><loc>${SITE}${u}</loc></url>`).join("")}</urlset>`, { headers: { "content-type": "application/xml" } });
     }
     // SPA shell with per-route meta
@@ -36,6 +37,13 @@ export default {
         const id = env.HUB.idFromName("main");
         const r = await env.HUB.get(id).fetch(new Request(SITE + "/api/doctors/" + url.pathname.split("/")[2]));
         if (r.ok) { const d = await r.json(); title = `${d.name_ar} - ${d.specialty_ar} | طبيبي`; desc = `احجز كشف مع ${d.name_ar} (${d.specialty_ar}) في ${d.city}. الكشف ${d.fee} جنيه. التقييم ${d.rating_avg} من ${d.rating_count} تقييم.`; }
+      } catch {}
+    }
+    if (url.pathname.startsWith("/specialty/")) {
+      try {
+        const m = await (await env.HUB.get(env.HUB.idFromName("main")).fetch(new Request(SITE + "/api/meta"))).json();
+        const sp = m.specialties.find((x) => x.id === url.pathname.split("/")[2]);
+        if (sp) { title = `دكتور ${sp.name_ar} | احجز كشف أونلاين | طبيبي`; desc = `أطباء ${sp.name_ar} في مصر: قارن الأسعار والتقييمات واحجز أقرب ميعاد في العيادة أو بالفيديو.`; }
       } catch {}
     }
     const esc = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");

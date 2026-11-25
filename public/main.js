@@ -1,5 +1,6 @@
 import { render, S, api } from "./core.js";
 import "./public.js";
+import "./pages2.js";
 import "./visuals.js";
 import "./account.js";
 render();
