@@ -24,14 +24,14 @@ export default {
       const r = await env.HUB.get(id).fetch(new Request(SITE + "/api/slugs"));
       const slugs = await r.json();
       const sp = await (await env.HUB.get(env.HUB.idFromName("main")).fetch(new Request(SITE + "/api/meta"))).json();
-      const urls = ["/", ...sp.specialties.map((s) => "/specialty/" + s.id), "/doctors", "/for-doctors", "/plans", "/faq", "/by-mahmoud", ...slugs.map((s) => "/doctor/" + s)];
+      const urls = ["/", ...sp.specialties.map((s) => "/specialty/" + s.id), "/doctors", "/for-doctors", "/plans", "/faq", "/by-mahmoud"];
       return new Response(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map((u) => `<url><loc>${SITE}${u}</loc></url>`).join("")}</urlset>`, { headers: { "content-type": "application/xml" } });
     }
     // SPA shell with per-route meta
     const shell = await env.ASSETS.fetch(new Request(url.origin + "/index.html"));
     let html = await shell.text();
     let [title, desc] = META[url.pathname] || ["طبيبي | احجز دكتورك أونلاين", META["/"][1]];
-    let noindex = /^\/(admin|account|login|register|book)/.test(url.pathname);
+    let noindex = /^\/(admin|account|login|register|book|doctor\/)/.test(url.pathname);
     if (url.pathname.startsWith("/doctor/")) {
       try {
         const id = env.HUB.idFromName("main");
