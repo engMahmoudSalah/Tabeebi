@@ -373,8 +373,9 @@ export class Hub extends DurableObject {
           clean(b.title_ar, 80), clean(b.bio_ar, 1200), clean(b.address, 160), clean(b.area, 60), f, Math.round(+b.fee_followup) || Math.round(f / 2), Math.round(+b.online_fee) || Math.round(f * 0.7), b.online_enabled && plan.online ? 1 : 0,
           JSON.stringify((b.services || []).slice(0, 8).map((s) => clean(s, 40))), JSON.stringify((b.langs || ["العربية"]).slice(0, 5).map((s) => clean(s, 20))), Math.max(0, Math.min(120, +b.waiting || 15)), d.id);
       }
+      if (m === "PUT") { const hf = Math.round(+b.home_fee) || 0; if (hf >= 50 && hf <= 8000) this.run(`INSERT OR REPLACE INTO home_visits(doctor_id, fee) VALUES(?,?)`, d.id, hf); else this.run(`DELETE FROM home_visits WHERE doctor_id=?`, d.id); }
       const x = this.one(`SELECT * FROM doctors WHERE id=?`, d.id);
-      return J({ ...x, services: JSON.parse(x.services), langs: JSON.parse(x.langs), plan });
+      return J({ ...x, home_fee: this.one(`SELECT fee FROM home_visits WHERE doctor_id=?`, d.id)?.fee || 0, services: JSON.parse(x.services), langs: JSON.parse(x.langs), plan });
     }
     if (p === "schedule") {
       if (m === "PUT") {
