@@ -108,5 +108,10 @@
     "name": "CV",
     "url": "https://cv.mahmodsalah.workers.dev/",
     "desc": "Resume page: skills, projects, education and a PDF download."
+  },
+  {
+    "name": "Velocity",
+    "url": "https://velocity.mahmodsalah.workers.dev/",
+    "desc": "Project and task board with real-time sync, roles, comments and activity, on Cloudflare."
   }
 ]
