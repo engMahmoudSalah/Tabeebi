@@ -283,3 +283,58 @@ textarea.in{min-height:90px;resize:vertical}
 .hero::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 80%,color-mix(in srgb,var(--lav) 14%,transparent),transparent 40%);pointer-events:none}
 .hero::after{content:"";position:absolute;inset-inline-start:-80px;bottom:-80px;width:300px;height:300px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M42 10h16v32h32v16H58v32H42V58H10V42h32z' fill='none' stroke='%2362d8b3' stroke-opacity='.18' stroke-width='1.5'/%3E%3C/svg%3E") center/contain no-repeat;animation:spin 60s linear infinite;pointer-events:none}
 @media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none}.helix i,.helix u{animation:none}}
+/* inner-page visuals */
+#app>*{animation:pgin .5s cubic-bezier(.2,.7,.2,1) both}
+@keyframes pgin{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.ill{width:170px;height:128px;display:block;margin:0 auto 6px;overflow:visible}
+.ill .fl{animation:flo 5s ease-in-out infinite}.ill .f2{animation-delay:-1.4s}.ill .f3{animation-delay:-2.6s}.ill .f4{animation-delay:-3.4s}
+@keyframes flo{50%{transform:translateY(-7px)}}
+.ill .beat{transform-origin:80px 64px;animation:beat 2.2s ease-in-out infinite}
+@keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.1)}30%{transform:scale(.97)}45%{transform:scale(1.06)}}
+.ill .swing{transform-origin:80px 30px;animation:swing 3s ease-in-out infinite}
+@keyframes swing{0%,100%{transform:rotate(-9deg)}50%{transform:rotate(9deg)}}
+.ill .scan{animation:scan 4s ease-in-out infinite}
+@keyframes scan{0%,100%{transform:translate(-8px,2px)}50%{transform:translate(10px,-4px)}}
+.ill .shackle{transform-origin:94px 58px;animation:shk 3.4s ease-in-out infinite}
+@keyframes shk{0%,60%,100%{transform:none}70%{transform:rotate(-8deg) translateY(-2px)}}
+.ill .draw{stroke-dasharray:30;stroke-dashoffset:30;animation:dr 3s ease-in-out infinite}
+@keyframes dr{0%{stroke-dashoffset:30}35%,85%{stroke-dashoffset:0}100%{stroke-dashoffset:30}}
+.empty{background:radial-gradient(320px 160px at 50% 0,var(--brand-soft),transparent 70%)}
+.kpi{position:relative;overflow:hidden;transition:border-color .2s,transform .25s}
+.kpi:hover{border-color:var(--brand);transform:translateY(-2px)}
+.kpi .spark{position:absolute;inset-inline:0;bottom:0;width:100%;height:34px;opacity:.9}
+.kpi .sl{stroke-dasharray:260;stroke-dashoffset:260;animation:sk 1.6s .2s ease-out forwards}
+@keyframes sk{to{stroke-dashoffset:0}}
+.kpi b{margin-bottom:22px}
+.page-h{position:relative;overflow:hidden}
+.ecg{position:absolute;inset-inline:0;bottom:0;width:100%;height:46px;opacity:.22;pointer-events:none}
+.ecg path{stroke-dasharray:700;stroke-dashoffset:700;animation:ecg 5s linear infinite}
+@keyframes ecg{to{stroke-dashoffset:-700}}
+.chart i{transform-origin:bottom;animation:grow .9s cubic-bezier(.2,.7,.2,1) backwards}
+.chart i:nth-child(n){animation-delay:calc(var(--i,0) * 1ms)}
+@keyframes grow{from{transform:scaleY(0)}}
+.progress i{animation:pw 1.2s cubic-bezier(.2,.7,.2,1) backwards}
+@keyframes pw{from{width:0}}
+.band{background:radial-gradient(circle at 1px 1px,color-mix(in srgb,var(--brand) 14%,transparent) 1px,transparent 0) 0 0/22px 22px,var(--bg2)}
+.plan{transform:perspective(900px) rotateX(var(--tx,0)) rotateY(var(--ty,0));transition:transform .25s ease-out,border-color .2s}
+.plan.hot{position:relative}
+.plan.hot::before{content:"";position:absolute;inset:-2px;border-radius:22px;padding:2px;background:conic-gradient(from var(--an,0deg),var(--brand),var(--lav),var(--warm),var(--brand));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:an 6s linear infinite;opacity:.8;pointer-events:none}
+@property --an{syntax:"<angle>";inherits:false;initial-value:0deg}
+@keyframes an{to{--an:360deg}}
+.acc .side a{transition:.2s}.acc .side a:hover{padding-inline-start:18px}
+.orbit{position:absolute;width:150px;height:150px;inset-block-start:-30px;inset-inline-end:-40px;perspective:600px;transform-style:preserve-3d;pointer-events:none;opacity:.9}
+.auth{position:relative}
+.orbit .core{position:absolute;inset:55px;border-radius:50%;background:var(--brand-soft);border:1px solid var(--brand);display:grid;place-items:center;color:var(--brand);font-size:26px;font-weight:700;line-height:1}
+.orbit .ring{position:absolute;inset:0;border:1.5px dashed color-mix(in srgb,var(--brand) 55%,transparent);border-radius:50%;transform-style:preserve-3d;animation:orb 9s linear infinite}
+.orbit .ring.r1{transform:rotateX(70deg);animation-duration:12s;border-color:color-mix(in srgb,var(--warm) 60%,transparent)}
+.orbit .ring.r2{transform:rotateY(70deg);animation-duration:15s;border-color:color-mix(in srgb,var(--lav) 70%,transparent)}
+.orbit .ring b{position:absolute;top:-5px;inset-inline-start:calc(50% - 5px);width:10px;height:10px;border-radius:50%;background:var(--brand)}
+.orbit .r1 b{background:var(--warm)}.orbit .r2 b{background:var(--lav)}
+@keyframes orb{to{transform:rotateZ(360deg)}}
+.orbit .ring.r0{transform:rotateX(20deg) rotateZ(0)}
+.orbit.big{width:240px;height:240px;inset-block-start:50%;margin-top:-120px;inset-inline-end:2%}
+.orbit.big .core{inset:90px;font-size:34px}
+.hero .wrap{position:relative}
+@media(max-width:800px){.orbit.big{display:none}}
+@media(prefers-reduced-motion:reduce){#app>*,.ill *,.ecg path,.orbit .ring,.plan.hot::before,.chart i,.progress i,.kpi .sl{animation:none!important}.kpi .sl{stroke-dashoffset:0}}
+.auth>.orbit{inset-block-start:-60px;inset-inline-end:-70px;opacity:.55;z-index:0}.auth>.box{position:relative;z-index:1}

@@ -1,3 +1,4 @@
+import { ill } from "./visuals.js";
 import { helix, countUp, S, T, h, $, $$, ic, money, num, toast, api, route, nav, doctorCard, specName, dname, avatar, stars, dayName, dayNum, monthName, fmtDate, fmtTime, setSession, render, nextLabel } from "./core.js";
 
 const fillSpecSelect = (sel) => `<option value="">${T("كل التخصصات", "All specialties")}</option>` + S.meta.specialties.map((s) => `<option value="${s.id}" ${sel === s.id ? "selected" : ""}>${h(S.lang === "ar" ? s.name_ar : s.name_en)}</option>`).join("");
@@ -52,7 +53,7 @@ route(/^\/doctors$/, async (app, m, q) => {
     $("#res").innerHTML = `<div class="skel"></div><div class="skel"></div><div class="skel"></div>`;
     const d = await api("/doctors?" + p); d.items.forEach((x) => (x.fav = favs.has(x.id)));
     $("#cnt").textContent = T(`${num(d.total)} طبيب`, `${d.total} doctors`);
-    $("#res").innerHTML = d.items.length ? d.items.map(doctorCard).join("") : `<div class="empty" style="grid-column:1/-1">${ic("search")}<p>${T("مفيش نتايج بالفلاتر دي. جرب توسع البحث.", "No results with these filters. Try widening your search.")}</p></div>`;
+    $("#res").innerHTML = d.items.length ? d.items.map(doctorCard).join("") : `<div class="empty" style="grid-column:1/-1">${ill("search")}<p>${T("مفيش نتايج بالفلاتر دي. جرب توسع البحث.", "No results with these filters. Try widening your search.")}</p></div>`;
     const pages = Math.ceil(d.total / d.per); $("#pg").innerHTML = pages > 1 ? Array.from({ length: pages }, (_, i) => `<button class="${i + 1 === st.page ? "on" : ""}" data-p="${i + 1}">${num(i + 1)}</button>`).join("") : "";
   };
   const bind = (id, key, fn = (v) => v) => $(id).addEventListener(id === "#fq" ? "input" : "change", (e) => { st[key] = fn(e.target.type === "checkbox" ? (e.target.checked ? "1" : "") : e.target.value); st.page = 1; clearTimeout(bind.t); bind.t = setTimeout(load, id === "#fq" ? 300 : 0); });
