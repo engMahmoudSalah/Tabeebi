@@ -379,3 +379,4 @@ html,body{overflow-x:clip}
 html,body{overflow-x:clip}
 .auth>.steth{inset-block-start:30px;inset-inline-end:-170px;width:150px}
 @media(max-width:900px){.auth>.steth{display:none}}
+.seg{border-radius:22px}.seg:has(button:nth-child(3)){grid-template-columns:1fr 1fr}.seg button:nth-child(3){grid-column:1/-1}

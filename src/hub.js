@@ -38,6 +38,8 @@ export class Hub extends DurableObject {
     this.run(`CREATE TABLE IF NOT EXISTS specialties(id TEXT PRIMARY KEY, name_ar TEXT, name_en TEXT)`);
     this.run(`CREATE TABLE IF NOT EXISTS plans(id TEXT PRIMARY KEY, name_ar TEXT, name_en TEXT, price INTEGER, cap INTEGER, boost INTEGER, online INTEGER, analytics INTEGER, featured INTEGER, features TEXT)`);
     this.run(`CREATE TABLE IF NOT EXISTS doctors(id TEXT PRIMARY KEY, user_id TEXT, slug TEXT UNIQUE, name_ar TEXT, name_en TEXT, spec TEXT, title_ar TEXT, bio_ar TEXT, bio_en TEXT, female INTEGER, years INTEGER, city TEXT, area TEXT, address TEXT, fee INTEGER, fee_followup INTEGER, online_fee INTEGER, online_enabled INTEGER DEFAULT 0, services TEXT, langs TEXT, waiting INTEGER, hue INTEGER, status TEXT, base_avg REAL, base_n INTEGER, seeded INTEGER DEFAULT 0, license TEXT, created_at TEXT)`);
+    this.run(`CREATE TABLE IF NOT EXISTS meta_flags(k TEXT PRIMARY KEY, v TEXT)`);
+    this.run(`CREATE TABLE IF NOT EXISTS home_visits(doctor_id TEXT PRIMARY KEY, fee INTEGER)`);
     this.run(`CREATE TABLE IF NOT EXISTS schedules(id INTEGER PRIMARY KEY AUTOINCREMENT, doctor_id TEXT, dow INTEGER, start TEXT, end TEXT, slot INTEGER)`);
     this.run(`CREATE TABLE IF NOT EXISTS time_off(doctor_id TEXT, date TEXT, PRIMARY KEY(doctor_id, date))`);
     this.run(`CREATE TABLE IF NOT EXISTS appointments(id TEXT PRIMARY KEY, code TEXT UNIQUE, doctor_id TEXT, patient_id TEXT, date TEXT, time TEXT, kind TEXT, status TEXT, name TEXT, phone TEXT, reason TEXT, fee INTEGER, created_at TEXT, note TEXT)`);
@@ -75,6 +77,10 @@ export class Hub extends DurableObject {
     this.run(`INSERT INTO meta VALUES('seeded','1')`);
   }
   async ensureAdmin() {
+    if (!this.one(`SELECT 1 x FROM meta_flags WHERE k='home_seed'`)) {
+      this.run(`INSERT INTO home_visits SELECT id, ((fee*3/2+25)/50)*50 FROM doctors WHERE user_id IS NULL AND spec IN ('pediatrics','internal','physio','nutrition','obgyn','neurology','orthopedics') AND (unicode(substr(slug,1,1))+length(slug)) % 2 = 0`);
+      this.run(`INSERT INTO meta_flags VALUES('home_seed','1')`);
+    }
     this.run(`UPDATE appointments SET status='confirmed' WHERE status='booked' AND doctor_id IN (SELECT id FROM doctors WHERE user_id IS NULL)`);
     if (this.env.CLEANUP_TEST) {
       const us = this.q(`SELECT id FROM users WHERE email LIKE '%@example.com'`).map((u) => u.id);
@@ -134,7 +140,7 @@ export class Hub extends DurableObject {
       id: d.id, slug: d.slug, name_ar: d.name_ar, name_en: d.name_en, spec: d.spec, specialty_ar: specMap[d.spec]?.name_ar, specialty_en: specMap[d.spec]?.name_en,
       title_ar: d.title_ar, city: d.city, area: d.area, address: d.address, fee: d.fee, fee_followup: d.fee_followup, online_fee: d.online_fee, years: d.years,
       female: !!d.female, hue: d.hue, rating_avg: r.avg, rating_count: r.count, waiting: d.waiting, services: JSON.parse(d.services || "[]"), langs: JSON.parse(d.langs || "[]"),
-      online: !!(d.online_enabled && plan.online), plan: plan.id, verified: plan.boost > 0, featured: !!plan.featured,
+      online: !!(d.online_enabled && plan.online), home_fee: this.one(`SELECT fee FROM home_visits WHERE doctor_id=?`, d.id)?.fee || 0, plan: plan.id, verified: plan.boost > 0, featured: !!plan.featured,
     };
   }
   specMap() { return Object.fromEntries(this.q(`SELECT * FROM specialties`).map((s) => [s.id, s])); }
@@ -251,6 +257,7 @@ export class Hub extends DurableObject {
     if (sp.get("max_fee")) rows = rows.filter((d) => d.fee <= +sp.get("max_fee"));
     let cards = rows.map((d) => this.card(d, sm, planCache));
     if (sp.get("online") === "1") cards = cards.filter((c) => c.online);
+    if (sp.get("home") === "1") cards = cards.filter((c) => c.home_fee);
     if (sp.get("min_rating")) cards = cards.filter((c) => c.rating_avg >= +sp.get("min_rating"));
     const today = cairoNow().date;
     const byId = Object.fromEntries(rows.map((d) => [d.id, d]));
@@ -278,7 +285,10 @@ export class Hub extends DurableObject {
   book(user, b) {
     const d = this.one(`SELECT * FROM doctors WHERE (slug=? OR id=?) AND status='approved'`, String(b.doctor), String(b.doctor)); if (!d) return err("الدكتور غير موجود", 404);
     const date = b.date, time = b.time; if (!isDate(date) || !isTime(time)) return err("اختر يوم وميعاد");
-    const kind = b.kind === "online" ? "online" : "clinic";
+    const kind = b.kind === "online" ? "online" : b.kind === "home" ? "home" : "clinic";
+    const homeFee = kind === "home" ? this.one(`SELECT fee FROM home_visits WHERE doctor_id=?`, d.id)?.fee : 0;
+    if (kind === "home" && !homeFee) return err("الزيارة المنزلية غير متاحة عند الدكتور ده");
+    const addr = clean(b.address, 200); if (kind === "home" && addr.length < 8) return err("اكتب عنوانك بالتفصيل للزيارة المنزلية");
     const plan = this.activePlan(d.id);
     if (kind === "online" && !(d.online_enabled && plan.online)) return err("الكشف أونلاين غير متاح عند الدكتور ده");
     const name = clean(b.name, 80), phone = clean(b.phone, 20).replace(/[^\d+]/g, "");
@@ -292,11 +302,11 @@ export class Hub extends DurableObject {
     if (!slot) return err(day.reason === "off" ? "الدكتور في إجازة اليوم ده" : "الميعاد ده غير متاح");
     if (!slot.free) return err(day.reason === "cap" ? "اكتمل حجز الدكتور للشهر ده" : "الميعاد اتحجز من حد تاني، اختر ميعاد تاني", 409);
     const id = rid(), code = "TB-" + crypto.getRandomValues(new Uint8Array(6)).reduce((s, n) => s + "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[n % 32], "");
-    const fee = kind === "online" ? d.online_fee : d.fee;
-    try { this.run(`INSERT INTO appointments VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)`, id, code, d.id, user.id, date, time, kind, d.user_id ? "booked" : "confirmed", name, phone, clean(b.reason, 300), fee, new Date().toISOString(), null); }
+    const fee = kind === "online" ? d.online_fee : kind === "home" ? homeFee : d.fee;
+    try { this.run(`INSERT INTO appointments VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)`, id, code, d.id, user.id, date, time, kind, d.user_id ? "booked" : "confirmed", name, phone, (kind === "home" ? "[زيارة منزلية] " + addr + (b.reason ? " | " : "") : "") + clean(b.reason, 300), fee, new Date().toISOString(), null); }
     catch { return err("الميعاد اتحجز من حد تاني، اختر ميعاد تاني", 409); }
     this.notify(user.id, "تم تأكيد حجزك", `${d.name_ar} يوم ${date} الساعة ${time}. كود الحجز ${code}.`);
-    this.notify(d.user_id, "حجز جديد", `${name} حجز ${date} ${time} (${kind === "online" ? "أونلاين" : "عيادة"}).`);
+    this.notify(d.user_id, "حجز جديد", `${name} حجز ${date} ${time} (${kind === "online" ? "أونلاين" : kind === "home" ? "زيارة منزلية" : "عيادة"}).`);
     return J({ id, code, doctor: d.name_ar, date, time, kind, fee, address: d.address }, 201);
   }
   myAppointments(user) {
