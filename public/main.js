@@ -2,6 +2,7 @@ import { render, S, api } from "./core.js";
 import "./public.js";
 import "./pages2.js";
 import "./visuals.js";
+import "./i18n-en.js";
 import "./account.js";
 render();
 if (S.token) api("/notifications").then((l) => { S.unread = l.filter((n) => !n.read).length; if (S.unread) render(); }).catch(() => {});
