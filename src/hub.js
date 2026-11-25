@@ -176,6 +176,19 @@ export class Hub extends DurableObject {
 
   // ---------- router ----------
   async fetch(req) {
+    // read cache: cuts rows-read for anonymous GETs (free-tier DO limit); any write clears it
+    this._c = this._c || new Map();
+    if (req.method !== "GET") { this._c.clear(); return this.fetch0(req); }
+    const u = new URL(req.url);
+    const ok = !req.headers.get("authorization") && /^\/api\/(meta|slugs|stats|doctors(\/[a-z0-9-]+)?)$/.test(u.pathname);
+    if (!ok) return this.fetch0(req);
+    const k = u.pathname + u.search, hit = this._c.get(k);
+    if (hit && Date.now() - hit.t < 60000) return new Response(hit.b, { status: hit.s, headers: hit.h });
+    const r = await this.fetch0(req);
+    if (r.status === 200) { const b = await r.clone().text(); if (this._c.size > 200) this._c.clear(); this._c.set(k, { t: Date.now(), b, s: 200, h: [...r.headers] }); }
+    return r;
+  }
+  async fetch0(req) {
     const url = new URL(req.url);
     const path = url.pathname.replace(/^\/api/, "") || "/";
     const m = req.method;
