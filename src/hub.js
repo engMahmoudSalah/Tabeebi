@@ -81,7 +81,7 @@ export class Hub extends DurableObject {
       this.run(`INSERT INTO home_visits SELECT id, ((fee*3/2+25)/50)*50 FROM doctors WHERE user_id IS NULL AND spec IN ('pediatrics','internal','physio','nutrition','obgyn','neurology','orthopedics') AND (unicode(substr(slug,1,1))+length(slug)) % 2 = 0`);
       this.run(`INSERT INTO meta_flags VALUES('home_seed','1')`);
     }
-    this.run(`UPDATE appointments SET status='confirmed' WHERE status='booked' AND doctor_id IN (SELECT id FROM doctors WHERE user_id IS NULL)`);
+    if (!this.one(`SELECT 1 x FROM meta_flags WHERE k='auto_confirm'`)) { this.run(`UPDATE appointments SET status='confirmed' WHERE status='booked' AND doctor_id IN (SELECT id FROM doctors WHERE user_id IS NULL)`); this.run(`INSERT INTO meta_flags VALUES('auto_confirm','1')`); }
     if (this.env.CLEANUP_TEST) {
       const us = this.q(`SELECT id FROM users WHERE email LIKE '%@example.com'`).map((u) => u.id);
       for (const id of us) { const d = this.one(`SELECT id FROM doctors WHERE user_id=?`, id); if (d) { for (const t of ['schedules','time_off','subscriptions','reviews']) this.run(`DELETE FROM ${t} WHERE doctor_id=?`, d.id); this.run(`DELETE FROM appointments WHERE doctor_id=?`, d.id); this.run(`DELETE FROM doctors WHERE id=?`, d.id); } this.run(`DELETE FROM appointments WHERE patient_id=?`, id); this.run(`DELETE FROM notifications WHERE user_id=?`, id); this.run(`DELETE FROM favorites WHERE user_id=?`, id); this.run(`DELETE FROM users WHERE id=?`, id); }
