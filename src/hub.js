@@ -75,6 +75,7 @@ export class Hub extends DurableObject {
     this.run(`INSERT INTO meta VALUES('seeded','1')`);
   }
   async ensureAdmin() {
+    this.run(`UPDATE appointments SET status='confirmed' WHERE status='booked' AND doctor_id IN (SELECT id FROM doctors WHERE user_id IS NULL)`);
     if (this.env.CLEANUP_TEST) {
       const us = this.q(`SELECT id FROM users WHERE email LIKE '%@example.com'`).map((u) => u.id);
       for (const id of us) { const d = this.one(`SELECT id FROM doctors WHERE user_id=?`, id); if (d) { for (const t of ['schedules','time_off','subscriptions','reviews']) this.run(`DELETE FROM ${t} WHERE doctor_id=?`, d.id); this.run(`DELETE FROM appointments WHERE doctor_id=?`, d.id); this.run(`DELETE FROM doctors WHERE id=?`, d.id); } this.run(`DELETE FROM appointments WHERE patient_id=?`, id); this.run(`DELETE FROM notifications WHERE user_id=?`, id); this.run(`DELETE FROM favorites WHERE user_id=?`, id); this.run(`DELETE FROM users WHERE id=?`, id); }
@@ -292,7 +293,7 @@ export class Hub extends DurableObject {
     if (!slot.free) return err(day.reason === "cap" ? "اكتمل حجز الدكتور للشهر ده" : "الميعاد اتحجز من حد تاني، اختر ميعاد تاني", 409);
     const id = rid(), code = "TB-" + crypto.getRandomValues(new Uint8Array(6)).reduce((s, n) => s + "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[n % 32], "");
     const fee = kind === "online" ? d.online_fee : d.fee;
-    try { this.run(`INSERT INTO appointments VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)`, id, code, d.id, user.id, date, time, kind, "booked", name, phone, clean(b.reason, 300), fee, new Date().toISOString(), null); }
+    try { this.run(`INSERT INTO appointments VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)`, id, code, d.id, user.id, date, time, kind, d.user_id ? "booked" : "confirmed", name, phone, clean(b.reason, 300), fee, new Date().toISOString(), null); }
     catch { return err("الميعاد اتحجز من حد تاني، اختر ميعاد تاني", 409); }
     this.notify(user.id, "تم تأكيد حجزك", `${d.name_ar} يوم ${date} الساعة ${time}. كود الحجز ${code}.`);
     this.notify(d.user_id, "حجز جديد", `${name} حجز ${date} ${time} (${kind === "online" ? "أونلاين" : "عيادة"}).`);
