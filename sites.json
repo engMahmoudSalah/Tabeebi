@@ -1,0 +1,102 @@
+[
+ {
+  "name": "MD Portfolio",
+  "url": "https://md.mahmodsalah.workers.dev/",
+  "desc": "React frontend portfolio with live telemetry, blog, vouch wall and client project tracking."
+ },
+ {
+  "name": "German File Kit",
+  "url": "https://german-file-kit.mahmodsalah.workers.dev/",
+  "desc": "Arabic-first Chancenkarte kit: points calculator, document checklist, cover-letter drafter and embassy step tracker."
+ },
+ {
+  "name": "SIM Services",
+  "url": "https://sim-service.mahmodsalah.workers.dev/",
+  "desc": "Bilingual telecom services platform for agents in Morocco: recharges, contracts and commissions."
+ },
+ {
+  "name": "Meetly",
+  "url": "https://meetly.mahmodsalah.workers.dev/",
+  "desc": "Real-time E2EE video conferencing with screen sharing and a collaborative whiteboard."
+ },
+ {
+  "name": "Velocity Workspace",
+  "url": "https://project-manageiment-tool-9014.ai.studio/",
+  "desc": "Enterprise real-time project management workspace with live Kanban and role-based access."
+ },
+ {
+  "name": "Fakhama Luxury Store",
+  "url": "https://fakhama.mahmodsalah.workers.dev/",
+  "desc": "Luxury e-commerce platform with a real-time store control panel, live stock and an AI concierge."
+ },
+ {
+  "name": "WASLA",
+  "url": "https://wasla.mahmodsalah.workers.dev/",
+  "desc": "AI-powered career bridge: aggregates job posts and tailors the CV to each posting."
+ },
+ {
+  "name": "Quill",
+  "url": "https://blogging-platform.mahmodsalah.workers.dev/",
+  "desc": "Publishing platform with accounts, drafts, scheduling, moderated comments and a newsletter."
+ },
+ {
+  "name": "Stash",
+  "url": "https://stools.mahmodsalah.workers.dev/",
+  "desc": "Bookmark vault: collections, tags, instant search, public share pages, import and export."
+ },
+ {
+  "name": "Naturix",
+  "url": "https://naturix.mahmodsalah.workers.dev/",
+  "desc": "AI-powered recipe recommendation system with a dynamic interactive interface."
+ },
+ {
+  "name": "TaqwaShield AI",
+  "url": "https://taqwa-shield-ai.mahmodsalah.workers.dev/",
+  "desc": "Smart browser extension that detects and blurs inappropriate content instantly, on-device."
+ },
+ {
+  "name": "AI Summit",
+  "url": "https://event-page.mahmodsalah.workers.dev/",
+  "desc": "Event platform: publish agendas and speakers, issue free QR tickets, check attendees in and approve events as admin."
+ },
+ {
+  "name": "Orbit Tasks",
+  "url": "https://to-do-list.mahmodsalah.workers.dev/",
+  "desc": "Team task manager: workspaces, invites, kanban boards, recurring tasks, reminders and a calendar."
+ },
+ {
+  "name": "Aqar Real Estate",
+  "url": "https://real-state.mahmodsalah.workers.dev/",
+  "desc": "Arabic-first (RTL) real estate marketplace: buyer and agent accounts, filters, favorites, inquiry inbox and admin approval."
+ },
+ {
+  "name": "Magic Convertor",
+  "url": "https://magic-convertor.mahmodsalah.workers.dev/",
+  "desc": "Browser-based toolkit of 45+ PDF, image and document tools with OCR, forms, editing, accounts, plans and an admin dashboard."
+ },
+ {
+  "name": "Children Skills",
+  "url": "https://children-skills.mahmodsalah.workers.dev/",
+  "desc": "Playful skills-learning experience built for kids."
+ },
+ {
+  "name": "Foda Salama",
+  "url": "https://foda-salama.mahmodsalah.workers.dev/",
+  "desc": "School website for Foda Salama Primary School."
+ },
+ {
+  "name": "Right Water",
+  "url": "https://right-water.mahmodsalah.workers.dev/",
+  "desc": "Water services company site with a clean, fresh look."
+ },
+ {
+  "name": "Login Sahl",
+  "url": "https://login-sahl.mahmodsalah.workers.dev/",
+  "desc": "Simplified login and onboarding experience."
+ },
+ {
+  "name": "Lerne Deutsch",
+  "url": "https://lerne-deutsch.mahmodsalah.workers.dev/",
+  "desc": "Arabic-first German course: personal learning path, A1 to B1 lessons with audio, exercises and spaced review."
+ }
+]

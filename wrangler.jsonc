@@ -1,0 +1,15 @@
+{
+  "name": "tabeebi",
+  "main": "src/worker.js",
+  "compatibility_date": "2025-09-01",
+  "workers_dev": true,
+  "assets": {
+    "directory": "public",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/", "/doctors", "/doctors/*", "/doctor/*", "/specialty/*", "/plans", "/for-doctors", "/by-mahmoud", "/book/*", "/account", "/account/*", "/admin", "/admin/*", "/login", "/register", "/join", "/about", "/faq"]
+  },
+  "durable_objects": { "bindings": [{ "name": "HUB", "class_name": "Hub" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Hub"] }],
+  "observability": { "enabled": true }
+}
