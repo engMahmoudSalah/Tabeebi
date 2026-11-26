@@ -3,7 +3,7 @@ export { Hub };
 
 const SITE = "https://tabeebi.mahmodsalah.workers.dev";
 const META = {
-  "/": ["طبيبي | احجز دكتورك أونلاين في دقيقة", "ابحث عن أفضل الأطباء في مصر حسب التخصص والمنطقة، شوف المواعيد المتاحة واحجز كشف في العيادة أو أونلاين."],
+  "/": ["طبيبي (نسخة تجريبية) | Tabeebi demo: doctor booking platform", "نسخة تجريبية من منصة حجز الأطباء: كل الأطباء والمواعيد افتراضية ولا يوجد أطباء أو حجوزات حقيقية. Demo build: all doctors are fictional, no real clinicians or appointments."],
   "/doctors": ["دليل الأطباء | طبيبي", "قارن الأطباء حسب التخصص والسعر والتقييم واحجز موعدك فورا."],
   "/for-doctors": ["للأطباء | اشتراكات طبيبي", "انضم كطبيب: جدول مواعيد ذكي، ملف احترافي، حجوزات أونلاين وباقات اشتراك مرنة."],
   "/plans": ["باقات الأطباء | طبيبي", "قارن باقات الأطباء المجانية والمدفوعة على طبيبي."],
@@ -30,7 +30,7 @@ export default {
     // SPA shell with per-route meta
     const shell = await env.ASSETS.fetch(new Request(url.origin + "/index.html"));
     let html = await shell.text();
-    let [title, desc] = META[url.pathname] || ["طبيبي | احجز دكتورك أونلاين", META["/"][1]];
+    let [title, desc] = META[url.pathname] || ["طبيبي (نسخة تجريبية) | Tabeebi demo", META["/"][1]];
     let noindex = /^\/(admin|account|login|register|book|doctor\/)/.test(url.pathname);
     if (url.pathname.startsWith("/doctor/")) {
       try {

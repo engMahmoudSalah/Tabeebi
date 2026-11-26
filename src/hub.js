@@ -202,7 +202,7 @@ export class Hub extends DurableObject {
       if (path === "/health") return J({ ok: true, doctors: this.one(`SELECT COUNT(*) n FROM doctors`).n });
       if (path === "/slugs") return J(this.q(`SELECT slug FROM doctors WHERE status='approved'`).map((r) => r.slug));
       if (path === "/meta") return J({ specialties: this.q(`SELECT s.*, (SELECT COUNT(*) FROM doctors d WHERE d.spec=s.id AND d.status='approved') n FROM specialties s`), cities: CITIES, plans: this.q(`SELECT * FROM plans`).map((p) => ({ ...p, features: JSON.parse(p.features) })), today: cairoNow().date });
-      if (path === "/stats") return J({ doctors: this.one(`SELECT COUNT(*) n FROM doctors WHERE status='approved'`).n, specialties: this.one(`SELECT COUNT(*) n FROM specialties`).n, appointments: this.one(`SELECT COUNT(*) n FROM appointments`).n + 1280, reviews: this.one(`SELECT COUNT(*) n FROM reviews`).n });
+      if (path === "/stats") return J({ doctors: this.one(`SELECT COUNT(*) n FROM doctors WHERE status='approved'`).n, specialties: this.one(`SELECT COUNT(*) n FROM specialties`).n, appointments: this.one(`SELECT COUNT(*) n FROM appointments`).n, reviews: this.one(`SELECT COUNT(*) n FROM reviews`).n });
       if (path === "/auth/register" && m === "POST") return await this.register(body, "patient");
       if (path === "/auth/login" && m === "POST") return await this.login(body, req);
       if (path === "/doctors" && m === "GET") return this.listDoctors(url);
