@@ -233,6 +233,16 @@ export class Hub extends DurableObject {
       if (path === "/doctor/apply" && m === "POST") return await this.applyDoctor(body);
       // authenticated
       if (path === "/me") { need(); if (m === "PATCH") { const n = clean(body.name, 80), p = clean(body.phone, 20); if (n.length < 2) return err("الاسم قصير"); this.run(`UPDATE users SET name=?, phone=? WHERE id=?`, n, p, user.id); } return J({ user: this.one(`SELECT id,name,email,phone,role FROM users WHERE id=?`, user.id) }); }
+      if (path === "/me/password" && m === "POST") {
+        need(); const k = "pw" + user.id; const at = this.attempts.get(k) || { n: 0, t: Date.now() };
+        if (Date.now() - at.t > 10 * 60e3) { at.n = 0; at.t = Date.now(); }
+        if (at.n >= 5) return err("محاولات كتير. جرب بعد شوية.", 429);
+        const u = this.one(`SELECT * FROM users WHERE id=?`, user.id); const np = String(body.new_password || "");
+        if ((await this.hashPw(String(body.old_password || ""), u.salt)).hash !== u.hash) { at.n++; this.attempts.set(k, at); return err("كلمة المرور الحالية غير صحيحة", 403); }
+        if (np.length < 8) return err("كلمة المرور الجديدة 8 أحرف على الأقل");
+        const { salt, hash } = await this.hashPw(np); this.run(`UPDATE users SET salt=?, hash=? WHERE id=?`, salt, hash, user.id);
+        this.attempts.delete(k); return J({ ok: true });
+      }
       if (path === "/notifications") { need(); if (m === "POST") { this.run(`UPDATE notifications SET read=1 WHERE user_id=?`, user.id); return J({ ok: true }); } return J(this.q(`SELECT * FROM notifications WHERE user_id=? ORDER BY ts DESC LIMIT 30`, user.id)); }
       if (path === "/appointments" && m === "POST") return this.book(need(), body);
       if (path === "/appointments" && m === "GET") return this.myAppointments(need());
