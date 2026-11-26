@@ -134,6 +134,11 @@ export class Hub extends DurableObject {
       return p.exp > Date.now() ? p : null;
     } catch { return null; }
   }
+  throttle(k, max, win) {
+    const now = Date.now(); if (this.attempts.size > 2000) this.attempts.clear();
+    const a = this.attempts.get(k) || { n: 0, t: now }; if (now - a.t > win) { a.n = 0; a.t = now; }
+    a.n++; this.attempts.set(k, a); return a.n > max;
+  }
   async authUser(req) {
     const h = req.headers.get("authorization") || "";
     if (!h.startsWith("Bearer ")) return null;
@@ -227,7 +232,7 @@ export class Hub extends DurableObject {
       if (path === "/slugs") return J(this.q(`SELECT slug FROM doctors WHERE status='approved'`).map((r) => r.slug));
       if (path === "/meta") return J({ specialties: this.q(`SELECT s.*, (SELECT COUNT(*) FROM doctors d WHERE d.spec=s.id AND d.status='approved') n FROM specialties s`), cities: CITIES, areas: this.q(`SELECT DISTINCT city, area FROM doctors WHERE status='approved' AND area<>'' ORDER BY city, area`), plans: this.q(`SELECT * FROM plans`).map((p) => ({ ...p, features: JSON.parse(p.features) })), today: cairoNow().date });
       if (path === "/stats") return J({ doctors: this.one(`SELECT COUNT(*) n FROM doctors WHERE status='approved'`).n, specialties: this.one(`SELECT COUNT(*) n FROM specialties`).n, appointments: this.one(`SELECT COUNT(*) n FROM appointments`).n, reviews: this.one(`SELECT COUNT(*) n FROM reviews`).n });
-      if (path === "/auth/register" && m === "POST") return await this.register(body, "patient");
+      if (path === "/auth/register" && m === "POST") { if (this.throttle("reg" + (req.headers.get("cf-connecting-ip") || "x"), 10, 3600e3)) return err("محاولات كتير. جرب بعد شوية.", 429); } if (path === "/auth/register" && m === "POST") return await this.register(body, "patient");
       if (path === "/auth/login" && m === "POST") return await this.login(body, req);
       if (path === "/doctors" && m === "GET") return this.listDoctors(url);
       if ((x = path.match(/^\/doctors\/([a-z0-9-]+)$/)) && m === "GET") return this.doctorProfile(x[1], user);
@@ -237,7 +242,7 @@ export class Hub extends DurableObject {
         const plan = this.activePlan(d.id); const r = this.dayOpen(d, date, plan);
         return J({ date, ...r, online: !!(d.online_enabled && plan.online) });
       }
-      if (path === "/doctor/apply" && m === "POST") return await this.applyDoctor(body);
+      if (path === "/doctor/apply" && m === "POST") { if (this.throttle("app" + (req.headers.get("cf-connecting-ip") || "x"), 5, 3600e3)) return err("محاولات كتير. جرب بعد شوية.", 429); } if (path === "/doctor/apply" && m === "POST") return await this.applyDoctor(body);
       // authenticated
       if (path === "/me") { need(); if (m === "PATCH") { const n = clean(body.name, 80), p = clean(body.phone, 20); if (n.length < 2) return err("الاسم قصير"); this.run(`UPDATE users SET name=?, phone=? WHERE id=?`, n, p, user.id); } return J({ user: this.one(`SELECT id,name,email,phone,role FROM users WHERE id=?`, user.id) }); }
       if (path === "/me/password" && m === "POST") {
