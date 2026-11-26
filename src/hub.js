@@ -68,6 +68,9 @@ export class Hub extends DurableObject {
     this.run(`CREATE TABLE IF NOT EXISTS favorites(user_id TEXT, doctor_id TEXT, PRIMARY KEY(user_id, doctor_id))`);
     this.run(`CREATE TABLE IF NOT EXISTS subscriptions(id TEXT PRIMARY KEY, doctor_id TEXT, plan_id TEXT, status TEXT, started_at TEXT, expires_at TEXT, note TEXT, created_at TEXT)`);
     this.run(`CREATE TABLE IF NOT EXISTS notifications(id TEXT PRIMARY KEY, user_id TEXT, title TEXT, body TEXT, ts TEXT, read INTEGER DEFAULT 0)`);
+    this.run(`CREATE INDEX IF NOT EXISTS ix_sub_doc ON subscriptions(doctor_id, status)`);
+    this.run(`CREATE INDEX IF NOT EXISTS ix_rev_doc ON reviews(doctor_id)`);
+    this.run(`CREATE INDEX IF NOT EXISTS ix_notif_user ON notifications(user_id, ts)`);
     if (!this.one(`SELECT 1 x FROM meta WHERE k='seeded'`)) this.seed();
   }
   async loadSecret() {
