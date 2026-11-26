@@ -392,3 +392,4 @@ html,body{overflow-x:clip}
 .pstat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;text-align:center;display:flex;flex-direction:column;justify-content:center}
 .pstat b{font-size:28px;color:var(--brand);line-height:1.1}.pstat span{color:var(--mute);font-size:13px}
 @media(max-width:640px){.pdash{grid-template-columns:1fr 1fr 1fr}.pnext{grid-column:1/-1}}
+.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}@media(max-width:700px){.row3{grid-template-columns:1fr}}
