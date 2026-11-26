@@ -17,7 +17,7 @@ const addDays = (d, n) => { const t = new Date(d + "T12:00:00Z"); t.setUTCDate(t
 const dowOf = (d) => (new Date(d + "T12:00:00Z").getUTCDay() + 1) % 7; // Sat=0 .. Fri=6
 const toMin = (t) => +t.slice(0, 2) * 60 + +t.slice(3, 5);
 const fromMin = (m) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
-const isDate = (s) => /^\d{4}-\d{2}-\d{2}$/.test(s || "");
+const isDate = (s) => { if (typeof s !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return false; const d = new Date(s + "T00:00:00Z"); return !isNaN(d) && d.toISOString().slice(0, 10) === s; };
 const isTime = (s) => /^\d{2}:\d{2}$/.test(s || "");
 const clean = (s, n = 200) => String(s ?? "").replace(/[\u0000-\u001f<>]/g, " ").trim().slice(0, n);
 
@@ -253,7 +253,7 @@ export class Hub extends DurableObject {
       if ((x = path.match(/^\/appointments\/(\w+)\/cancel$/)) && m === "POST") return this.cancelMine(need(), x[1]);
       if ((x = path.match(/^\/appointments\/(\w+)\/review$/)) && m === "POST") return this.review(need(), x[1], body);
       if (path === "/favorites" && m === "GET") { need(); const sm = this.specMap(); return J(this.q(`SELECT d.* FROM favorites f JOIN doctors d ON d.id=f.doctor_id WHERE f.user_id=?`, user.id).map((d) => this.card(d, sm))); }
-      if ((x = path.match(/^\/favorites\/(\w+)$/))) { need(); if (m === "POST") this.run(`INSERT OR IGNORE INTO favorites VALUES(?,?)`, user.id, x[1]); else if (m === "DELETE") this.run(`DELETE FROM favorites WHERE user_id=? AND doctor_id=?`, user.id, x[1]); return J({ ok: true }); }
+      if ((x = path.match(/^\/favorites\/(\w+)$/))) { need(); if (m === "POST") { if (!this.one(`SELECT 1 x FROM doctors WHERE id=?`, x[1])) return err("الدكتور غير موجود", 404); this.run(`INSERT OR IGNORE INTO favorites VALUES(?,?)`, user.id, x[1]); } else if (m === "DELETE") this.run(`DELETE FROM favorites WHERE user_id=? AND doctor_id=?`, user.id, x[1]); return J({ ok: true }); }
       // doctor
       if (path.startsWith("/doctor/")) return await this.doctorApi(need("doctor"), path.slice(8), m, body, url);
       if (path.startsWith("/admin/")) return await this.adminApi(need("admin"), path.slice(7), m, body, url);
