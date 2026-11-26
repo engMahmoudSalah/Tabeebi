@@ -320,11 +320,11 @@ export class Hub extends DurableObject {
     catch { return err("الميعاد اتحجز من حد تاني، اختر ميعاد تاني", 409); }
     this.notify(user.id, "تم تأكيد حجزك", `${d.name_ar} يوم ${date} الساعة ${time}. كود الحجز ${code}.`);
     this.notify(d.user_id, "حجز جديد", `${name} حجز ${date} ${time} (${kind === "online" ? "أونلاين" : kind === "home" ? "زيارة منزلية" : "عيادة"}).`);
-    return J({ id, code, doctor: d.name_ar, date, time, kind, fee, address: d.address }, 201);
+    return J({ id, code, doctor: d.name_ar, doctor_en: d.name_en, date, time, kind, fee, address: d.address }, 201);
   }
   myAppointments(user) {
     const sm = this.specMap();
-    return J(this.q(`SELECT a.*, d.name_ar dname, d.slug, d.spec, d.address, d.hue, d.female, (SELECT id FROM reviews r WHERE r.appointment_id=a.id) reviewed FROM appointments a JOIN doctors d ON d.id=a.doctor_id WHERE a.patient_id=? ORDER BY a.date DESC, a.time DESC`, user.id).map((a) => ({ ...a, specialty_ar: sm[a.spec]?.name_ar })));
+    return J(this.q(`SELECT a.*, d.name_ar dname, d.name_en dname_en, d.slug, d.spec, d.address, d.hue, d.female, (SELECT id FROM reviews r WHERE r.appointment_id=a.id) reviewed FROM appointments a JOIN doctors d ON d.id=a.doctor_id WHERE a.patient_id=? ORDER BY a.date DESC, a.time DESC`, user.id).map((a) => ({ ...a, specialty_ar: sm[a.spec]?.name_ar })));
   }
   cancelMine(user, id) {
     const a = this.one(`SELECT * FROM appointments WHERE id=? AND patient_id=?`, id, user.id); if (!a) return err("الحجز غير موجود", 404);
@@ -458,7 +458,7 @@ export class Hub extends DurableObject {
       return J({ ok: true });
     }
     if (p === "users") return J(this.q(`SELECT id,name,email,phone,role,created_at FROM users ORDER BY created_at DESC LIMIT 200`));
-    if (p === "appointments") return J(this.q(`SELECT a.*, d.name_ar dname FROM appointments a JOIN doctors d ON d.id=a.doctor_id ORDER BY a.created_at DESC LIMIT 200`));
+    if (p === "appointments") return J(this.q(`SELECT a.*, d.name_ar dname, d.name_en dname_en FROM appointments a JOIN doctors d ON d.id=a.doctor_id ORDER BY a.created_at DESC LIMIT 200`));
     if (p === "subscriptions") return J(this.q(`SELECT s.*, d.name_ar dname FROM subscriptions s JOIN doctors d ON d.id=s.doctor_id WHERE s.status IN ('requested','active') AND s.note<>'seed' ORDER BY s.created_at DESC LIMIT 100`));
     if ((x = p.match(/^subscriptions\/(\w+)\/(approve|reject)$/)) && m === "POST") {
       const s = this.one(`SELECT * FROM subscriptions WHERE id=?`, x[1]); if (!s) return err("غير موجود", 404);
