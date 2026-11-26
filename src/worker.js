@@ -43,11 +43,13 @@ export default {
     const shell = await env.ASSETS.fetch(new Request(url.origin + "/index.html"));
     let html = await shell.text();
     let [title, desc] = META[url.pathname] || ["طبيبي (نسخة تجريبية) | Tabeebi demo", META["/"][1]];
-    let noindex = /^\/(admin|account|login|register|book|doctor\/)/.test(url.pathname);
+    let noindex = /^\/(admin|account|login|register|join|book|doctor\/)/.test(url.pathname);
+    let notFound = !META[url.pathname] && !/^\/(admin|account|login|register|join|book|doctor\/|specialty\/)/.test(url.pathname);
     if (url.pathname.startsWith("/doctor/")) {
       try {
         const id = env.HUB.idFromName("main");
         const r = await env.HUB.get(id).fetch(new Request(SITE + "/api/doctors/" + url.pathname.split("/")[2]));
+        if (!r.ok) notFound = true;
         if (r.ok) { const d = await r.json(); title = `${d.name_ar} - ${d.specialty_ar} | طبيبي`; desc = `احجز كشف مع ${d.name_ar} (${d.specialty_ar}) في ${d.city}. الكشف ${d.fee} جنيه. التقييم ${d.rating_avg} من ${d.rating_count} تقييم.`; }
       } catch {}
     }
@@ -55,9 +57,11 @@ export default {
       try {
         const m = await (await env.HUB.get(env.HUB.idFromName("main")).fetch(new Request(SITE + "/api/meta"))).json();
         const sp = m.specialties.find((x) => x.id === url.pathname.split("/")[2]);
+        if (!sp) notFound = true;
         if (sp) { title = `دكتور ${sp.name_ar} | احجز كشف أونلاين | طبيبي`; desc = `أطباء ${sp.name_ar} في مصر: قارن الأسعار والتقييمات واحجز أقرب ميعاد في العيادة أو بالفيديو.`; }
       } catch {}
     }
+    if (notFound) noindex = true;
     const esc = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
     const tags = `<title>${esc(title)}</title><meta name="description" content="${esc(desc)}"><link rel="canonical" href="${SITE}${url.pathname}"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:type" content="website"><meta property="og:url" content="${SITE}${url.pathname}"><meta name="twitter:card" content="summary">${noindex ? '<meta name="robots" content="noindex">' : ""}`;
     let ld = "";
@@ -68,6 +72,6 @@ export default {
       ld = `<script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "طبيبي (Tabeebi) demo", url: SITE, description: "Demo doctor booking platform. All doctors are fictional." }).replace(/</g, "\\u003c")}</script>`;
     }
     html = html.replace("<!--SEO-->", tags + ld);
-    return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-cache" } });
+    return new Response(html, { status: notFound ? 404 : 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-cache" } });
   },
 };
