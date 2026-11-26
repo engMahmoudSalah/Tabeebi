@@ -64,6 +64,7 @@ export class Hub extends DurableObject {
     this.run(`CREATE INDEX IF NOT EXISTS ix_appt_patient ON appointments(patient_id)`);
     this.run(`CREATE INDEX IF NOT EXISTS ix_appt_doc ON appointments(doctor_id, date)`);
     this.run(`CREATE TABLE IF NOT EXISTS reviews(id TEXT PRIMARY KEY, appointment_id TEXT UNIQUE, doctor_id TEXT, patient_id TEXT, author TEXT, rating INTEGER, title TEXT, body TEXT, reply TEXT, created_at TEXT)`);
+    this.run(`CREATE TABLE IF NOT EXISTS pw_changes(user_id TEXT PRIMARY KEY, at INTEGER)`);
     this.run(`CREATE TABLE IF NOT EXISTS favorites(user_id TEXT, doctor_id TEXT, PRIMARY KEY(user_id, doctor_id))`);
     this.run(`CREATE TABLE IF NOT EXISTS subscriptions(id TEXT PRIMARY KEY, doctor_id TEXT, plan_id TEXT, status TEXT, started_at TEXT, expires_at TEXT, note TEXT, created_at TEXT)`);
     this.run(`CREATE TABLE IF NOT EXISTS notifications(id TEXT PRIMARY KEY, user_id TEXT, title TEXT, body TEXT, ts TEXT, read INTEGER DEFAULT 0)`);
@@ -134,7 +135,10 @@ export class Hub extends DurableObject {
     const h = req.headers.get("authorization") || "";
     if (!h.startsWith("Bearer ")) return null;
     const p = await this.verify(h.slice(7));
-    return p ? this.one(`SELECT id,email,phone,name,role FROM users WHERE id=?`, p.sub) : null;
+    if (!p) return null;
+    const c = this.one(`SELECT at FROM pw_changes WHERE user_id=?`, p.sub);
+    if (c && p.exp - 30 * 864e5 < c.at - 2000) return null;
+    return this.one(`SELECT id,email,phone,name,role FROM users WHERE id=?`, p.sub);
   }
   async session(user) { return { token: await this.sign({ sub: user.id, exp: Date.now() + 30 * 864e5 }), user: { id: user.id, name: user.name, email: user.email, phone: user.phone, role: user.role } }; }
   notify(userId, title, body) { if (userId) this.run(`INSERT INTO notifications VALUES(?,?,?,?,?,0)`, rid(), userId, title, body, new Date().toISOString()); }
@@ -241,7 +245,7 @@ export class Hub extends DurableObject {
         if ((await this.hashPw(String(body.old_password || ""), u.salt)).hash !== u.hash) { at.n++; this.attempts.set(k, at); return err("كلمة المرور الحالية غير صحيحة", 403); }
         if (np.length < 8) return err("كلمة المرور الجديدة 8 أحرف على الأقل");
         const { salt, hash } = await this.hashPw(np); this.run(`UPDATE users SET salt=?, hash=? WHERE id=?`, salt, hash, user.id);
-        this.attempts.delete(k); return J({ ok: true });
+        this.run(`INSERT OR REPLACE INTO pw_changes VALUES(?,?)`, user.id, Date.now()); this.attempts.delete(k); return J({ ok: true, ...(await this.session(user)) });
       }
       if (path === "/notifications") { need(); if (m === "POST") { this.run(`UPDATE notifications SET read=1 WHERE user_id=?`, user.id); return J({ ok: true }); } return J(this.q(`SELECT * FROM notifications WHERE user_id=? ORDER BY ts DESC LIMIT 30`, user.id)); }
       if (path === "/appointments" && m === "POST") return this.book(need(), body);
