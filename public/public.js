@@ -3,7 +3,7 @@ import { ill } from "./visuals.js";
 import { demoNote, helix, countUp, S, T, h, $, $$, ic, money, num, toast, api, route, nav, doctorCard, specName, dname, avatar, stars, dayName, dayNum, monthName, fmtDate, fmtTime, setSession, render, nextLabel } from "./core.js";
 
 const fillSpecSelect = (sel) => `<option value="">${T("كل التخصصات", "All specialties")}</option>` + S.meta.specialties.map((s) => `<option value="${s.id}" ${sel === s.id ? "selected" : ""}>${h(S.lang === "ar" ? s.name_ar : s.name_en)}</option>`).join("");
-const cityOpts = (sel) => `<option value="">${T("كل المحافظات", "All cities")}</option>` + Object.keys(S.meta.cities).map((c) => `<option ${sel === c ? "selected" : ""}>${h(c)}</option>`).join("");
+const cityOpts = (sel) => `<option value="">${T("كل المحافظات", "All cities")}</option>` + Object.keys(S.meta.cities).map((c) => `<option value="${h(c)}" ${sel === c ? "selected" : ""}>${h(c)}</option>`).join("");
 
 route(/^\/$/, async (app) => {
   const [top, stats] = await Promise.all([api("/doctors?sort=rating"), api("/stats")]);
@@ -34,11 +34,12 @@ route(/^\/$/, async (app) => {
 });
 
 route(/^\/doctors$/, async (app, m, q) => {
-  const st = { q: q.get("q") || "", spec: q.get("spec") || "", city: q.get("city") || "", gender: q.get("gender") || "", max_fee: q.get("max_fee") || "", min_rating: q.get("min_rating") || "", online: q.get("online") || "", home: q.get("home") || "", today: q.get("today") || "", sort: q.get("sort") || "recommended", page: +q.get("page") || 1 };
+  const st = { q: q.get("q") || "", spec: q.get("spec") || "", city: q.get("city") || "", area: q.get("area") || "", gender: q.get("gender") || "", max_fee: q.get("max_fee") || "", min_rating: q.get("min_rating") || "", online: q.get("online") || "", home: q.get("home") || "", today: q.get("today") || "", sort: q.get("sort") || "recommended", page: +q.get("page") || 1 };
   app.innerHTML = `<div class="wrap"><div class="page-h"><h1>${T("دليل الأطباء", "Find a doctor")}</h1></div><div class="list-grid"><aside class="filters" id="fl">
    <div><label>${T("بحث", "Search")}</label><input class="in" id="fq" value="${h(st.q)}" placeholder="${T("اسم، منطقة، خدمة", "Name, area, service")}"></div>
    <div><label>${T("التخصص", "Specialty")}</label><select class="in" id="fs">${fillSpecSelect(st.spec)}</select></div>
    <div><label>${T("المحافظة", "City")}</label><select class="in" id="fc">${cityOpts(st.city)}</select></div>
+   <div><label>${T("المنطقة", "Area")}</label><select class="in" id="fa"></select></div>
    <div><label>${T("الجنس", "Gender")}</label><select class="in" id="fg"><option value="">${T("الكل", "Any")}</option><option value="m" ${st.gender === "m" ? "selected" : ""}>${T("دكتور", "Male")}</option><option value="f" ${st.gender === "f" ? "selected" : ""}>${T("دكتورة", "Female")}</option></select></div>
    <div><label>${T("أقصى سعر", "Max fee")}: <b id="fv">${st.max_fee ? money(st.max_fee) : T("بدون حد", "No limit")}</b></label><input type="range" id="ff" min="200" max="800" step="50" value="${st.max_fee || 800}" style="width:100%;accent-color:var(--brand)"></div>
    <div><label>${T("أقل تقييم", "Min rating")}</label><select class="in" id="fr"><option value="">${T("الكل", "Any")}</option>${[4, 4.5].map((r) => `<option value="${r}" ${+st.min_rating === r ? "selected" : ""}>${num(r)}+</option>`).join("")}</select></div>
@@ -59,6 +60,8 @@ route(/^\/doctors$/, async (app, m, q) => {
     const pages = Math.ceil(d.total / d.per); $("#pg").innerHTML = pages > 1 ? Array.from({ length: pages }, (_, i) => `<button class="${i + 1 === st.page ? "on" : ""}" data-p="${i + 1}">${num(i + 1)}</button>`).join("") : "";
   };
   const bind = (id, key, fn = (v) => v) => $(id).addEventListener(id === "#fq" ? "input" : "change", (e) => { st[key] = fn(e.target.type === "checkbox" ? (e.target.checked ? "1" : "") : e.target.value); st.page = 1; clearTimeout(bind.t); bind.t = setTimeout(load, id === "#fq" ? 300 : 0); });
+  const fillAreas = () => { const as = [...new Set(((S.meta && S.meta.areas) || []).filter((a) => !st.city || a.city === st.city).map((a) => a.area))]; if (st.area && !as.includes(st.area)) st.area = ""; $("#fa").innerHTML = `<option value="">${T("كل المناطق", "All areas")}</option>` + as.map((a) => `<option value="${h(a)}" ${a === st.area ? "selected" : ""}>${h(a)}</option>`).join(""); };
+  fillAreas(); $("#fc").addEventListener("change", () => setTimeout(() => { fillAreas(); load(); }, 0)); bind("#fa", "area");
   bind("#fq", "q"); bind("#fs", "spec"); bind("#fc", "city"); bind("#fg", "gender"); bind("#fr", "min_rating"); bind("#ft", "today"); bind("#fo", "online"); bind("#fh", "home"); bind("#so", "sort");
   $("#ff").addEventListener("input", (e) => { st.max_fee = +e.target.value >= 800 ? "" : e.target.value; $("#fv").textContent = st.max_fee ? money(st.max_fee) : T("بدون حد", "No limit"); st.page = 1; clearTimeout(bind.t); bind.t = setTimeout(load, 250); });
   $("#fx").addEventListener("click", () => nav("/doctors")); $("#pg").addEventListener("click", (e) => { const b = e.target.closest("[data-p]"); if (b) { st.page = +b.dataset.p; load(); window.scrollTo(0, 0); } });

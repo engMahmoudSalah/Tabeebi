@@ -222,7 +222,7 @@ export class Hub extends DurableObject {
       // public
       if (path === "/health") return J({ ok: true, doctors: this.one(`SELECT COUNT(*) n FROM doctors`).n });
       if (path === "/slugs") return J(this.q(`SELECT slug FROM doctors WHERE status='approved'`).map((r) => r.slug));
-      if (path === "/meta") return J({ specialties: this.q(`SELECT s.*, (SELECT COUNT(*) FROM doctors d WHERE d.spec=s.id AND d.status='approved') n FROM specialties s`), cities: CITIES, plans: this.q(`SELECT * FROM plans`).map((p) => ({ ...p, features: JSON.parse(p.features) })), today: cairoNow().date });
+      if (path === "/meta") return J({ specialties: this.q(`SELECT s.*, (SELECT COUNT(*) FROM doctors d WHERE d.spec=s.id AND d.status='approved') n FROM specialties s`), cities: CITIES, areas: this.q(`SELECT DISTINCT city, area FROM doctors WHERE status='approved' AND area<>'' ORDER BY city, area`), plans: this.q(`SELECT * FROM plans`).map((p) => ({ ...p, features: JSON.parse(p.features) })), today: cairoNow().date });
       if (path === "/stats") return J({ doctors: this.one(`SELECT COUNT(*) n FROM doctors WHERE status='approved'`).n, specialties: this.one(`SELECT COUNT(*) n FROM specialties`).n, appointments: this.one(`SELECT COUNT(*) n FROM appointments`).n, reviews: this.one(`SELECT COUNT(*) n FROM reviews`).n });
       if (path === "/auth/register" && m === "POST") return await this.register(body, "patient");
       if (path === "/auth/login" && m === "POST") return await this.login(body, req);
