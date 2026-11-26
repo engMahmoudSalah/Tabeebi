@@ -481,7 +481,7 @@ export class Hub extends DurableObject {
         plans: this.q(`SELECT plan_id, COUNT(*) n FROM subscriptions WHERE status='active' GROUP BY plan_id`),
       });
     }
-    if (p === "doctors") return J(this.q(`SELECT id,slug,name_ar,spec,city,fee,status,license,seeded,created_at FROM doctors WHERE (?='' OR status=?) ORDER BY CASE status WHEN 'pending' THEN 0 ELSE 1 END, created_at DESC LIMIT 200`, url.searchParams.get("status") || "", url.searchParams.get("status") || "").map((d) => ({ ...d, plan: this.activePlan(d.id).id })));
+    if (p === "doctors") return J(this.q(`SELECT id,slug,name_ar,name_en,spec,city,fee,status,license,seeded,created_at FROM doctors WHERE (?='' OR status=?) ORDER BY CASE status WHEN 'pending' THEN 0 ELSE 1 END, created_at DESC LIMIT 200`, url.searchParams.get("status") || "", url.searchParams.get("status") || "").map((d) => ({ ...d, plan: this.activePlan(d.id).id })));
     if ((x = p.match(/^doctors\/(\w+)\/status$/)) && m === "POST") {
       if (!["approved", "suspended", "pending"].includes(b.status)) return err("حالة غير صحيحة");
       const d = this.one(`SELECT * FROM doctors WHERE id=?`, x[1]); if (!d) return err("غير موجود", 404);
