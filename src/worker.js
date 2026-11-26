@@ -11,8 +11,20 @@ const META = {
   "/faq": ["الأسئلة الشائعة | طبيبي", "إجابات عن الحجز والإلغاء والكشف أونلاين وباقات الأطباء."],
 };
 
+const SEC = {
+  "content-security-policy": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'",
+  "x-frame-options": "DENY", "x-content-type-options": "nosniff", "referrer-policy": "strict-origin-when-cross-origin",
+  "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=()", "strict-transport-security": "max-age=31536000",
+};
 export default {
   async fetch(request, env) {
+    const r = await this.handle(request, env);
+    const o = new Response(r.body, r);
+    for (const [k, v] of Object.entries(SEC)) o.headers.set(k, v);
+    if (new URL(request.url).pathname.startsWith("/api/")) o.headers.set("cache-control", "no-store");
+    return o;
+  },
+  async handle(request, env) {
     const url = new URL(request.url);
     if (url.pathname.startsWith("/api/")) {
       const id = env.HUB.idFromName("main");
