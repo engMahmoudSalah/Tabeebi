@@ -54,7 +54,7 @@ route(/^\/doctors$/, async (app, m, q) => {
     history.replaceState({}, "", "/doctors" + (p.toString() ? "?" + p : ""));
     $("#res").innerHTML = `<div class="skel"></div><div class="skel"></div><div class="skel"></div>`;
     const d = await api("/doctors?" + p); d.items.forEach((x) => (x.fav = favs.has(x.id)));
-    $("#cnt").textContent = T(`${num(d.total)} طبيب`, `${d.total} doctors`);
+    $("#cnt").textContent = T(`${num(d.total)} طبيب`, `${d.total} doctors`); if (d.symptom_specs?.length) $("#cnt").textContent += " · " + T("نتائج حسب الأعراض: ", "Matched by symptom: ") + d.symptom_specs.map(specName).join(", ");
     $("#res").innerHTML = d.items.length ? d.items.map(doctorCard).join("") : `<div class="empty" style="grid-column:1/-1">${ill("search")}<p>${T("مفيش نتايج بالفلاتر دي. جرب توسع البحث.", "No results with these filters. Try widening your search.")}</p></div>`;
     const pages = Math.ceil(d.total / d.per); $("#pg").innerHTML = pages > 1 ? Array.from({ length: pages }, (_, i) => `<button class="${i + 1 === st.page ? "on" : ""}" data-p="${i + 1}">${num(i + 1)}</button>`).join("") : "";
   };

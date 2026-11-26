@@ -21,6 +21,23 @@ const isDate = (s) => /^\d{4}-\d{2}-\d{2}$/.test(s || "");
 const isTime = (s) => /^\d{2}:\d{2}$/.test(s || "");
 const clean = (s, n = 200) => String(s ?? "").replace(/[\u0000-\u001f<>]/g, " ").trim().slice(0, n);
 
+const SYMPTOMS = [
+  [["سنان", "ضرس", "اسنان", "تسوس", "لثة", "tooth", "teeth", "dental", "cavity", "gum"], ["dentistry"]],
+  [["جلد", "حب الشباب", "حبوب", "طفح", "حساسية جلد", "شعر", "skin", "acne", "rash", "eczema", "hair"], ["dermatology"]],
+  [["حمل", "ولادة", "دورة", "رحم", "pregnan", "period", "uterus", "cycle"], ["obgyn"]],
+  [["طفل", "رضيع", "تطعيم", "child", "baby", "infant", "vaccin"], ["pediatrics"]],
+  [["عظام", "ركبة", "ظهر", "كسر", "مفصل", "bone", "knee", "back pain", "fracture", "joint"], ["orthopedics", "physio"]],
+  [["عين", "نظر", "ضعف نظر", "eye", "vision", "sight"], ["ophthalmology"]],
+  [["أذن", "اذن", "زور", "لوز", "جيوب", "حنجرة", "ear", "throat", "sinus", "tonsil"], ["ent"]],
+  [["قلب", "ضغط", "خفقان", "صدر", "heart", "chest pain", "blood pressure", "palpitation"], ["cardiology", "internal"]],
+  [["صداع", "دوخة", "صرع", "اعصاب", "أعصاب", "headache", "migraine", "dizz", "nerve", "seizure"], ["neurology"]],
+  [["اكتئاب", "قلق", "نوم", "توتر", "anxiety", "depress", "stress", "sleep"], ["psychiatry"]],
+  [["مسالك", "كلى", "كلية", "بروستاتا", "urin", "kidney", "prostate"], ["urology"]],
+  [["سكر", "سمنة", "وزن", "تخسيس", "diabet", "weight", "diet", "obes"], ["nutrition", "internal"]],
+  [["علاج طبيعي", "رقبة", "عضل", "physio", "neck", "muscle", "rehab"], ["physio"]],
+  [["معدة", "قولون", "حرقان", "كبد", "stomach", "colon", "liver", "acid reflux", "fever", "حمى", "سخونية"], ["internal"]],
+];
+const symptomSpecs = (qs) => { const s = new Set(); for (const [ks, ids] of SYMPTOMS) if (ks.some((k) => qs.includes(k.toLowerCase()))) ids.forEach((i) => s.add(i)); return s; };
 export class Hub extends DurableObject {
   constructor(ctx, env) {
     super(ctx, env);
@@ -262,7 +279,8 @@ export class Hub extends DurableObject {
     let rows = this.q(`SELECT * FROM doctors WHERE status='approved'`);
     const planCache = {}; rows.forEach((d) => (planCache[d.id] = this.activePlan(d.id)));
     const qs = clean(sp.get("q"), 60).toLowerCase();
-    if (qs) rows = rows.filter((d) => [d.name_ar, d.name_en, d.title_ar, d.area, d.city, sm[d.spec]?.name_ar, sm[d.spec]?.name_en, d.services].join(" ").toLowerCase().includes(qs));
+    const symSpecs = qs ? symptomSpecs(qs) : new Set();
+    if (qs) rows = rows.filter((d) => symSpecs.has(d.spec) || [d.name_ar, d.name_en, d.title_ar, d.area, d.city, sm[d.spec]?.name_ar, sm[d.spec]?.name_en, d.services].join(" ").toLowerCase().includes(qs));
     if (sp.get("spec")) rows = rows.filter((d) => d.spec === sp.get("spec"));
     if (sp.get("city")) rows = rows.filter((d) => d.city === sp.get("city"));
     if (sp.get("area")) rows = rows.filter((d) => d.area === sp.get("area"));
@@ -284,7 +302,7 @@ export class Hub extends DurableObject {
     else if (sort === "soonest") cards.sort((a, b) => (a.next || "9") .localeCompare(b.next || "9"));
     else cards.sort((a, b) => boost(b) * 0.6 + b.rating_avg - (boost(a) * 0.6 + a.rating_avg));
     const total = cards.length, page = Math.max(1, +sp.get("page") || 1), per = 12;
-    return J({ total, page, per, items: cards.slice((page - 1) * per, page * per) });
+    return J({ total, page, per, symptom_specs: [...symSpecs], items: cards.slice((page - 1) * per, page * per) });
   }
   doctorProfile(slug, user) {
     const d = this.one(`SELECT * FROM doctors WHERE slug=? AND status='approved'`, slug); if (!d) return err("الدكتور غير موجود", 404);

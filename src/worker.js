@@ -60,7 +60,14 @@ export default {
     }
     const esc = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
     const tags = `<title>${esc(title)}</title><meta name="description" content="${esc(desc)}"><link rel="canonical" href="${SITE}${url.pathname}"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:type" content="website"><meta property="og:url" content="${SITE}${url.pathname}"><meta name="twitter:card" content="summary">${noindex ? '<meta name="robots" content="noindex">' : ""}`;
-    html = html.replace("<!--SEO-->", tags);
+    let ld = "";
+    if (url.pathname.startsWith("/specialty/")) {
+      const crumbs = [["طبيبي", "/"], ["الأطباء", "/doctors"], [title.split("|")[0].trim(), url.pathname]];
+      ld = `<script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: crumbs.map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c[0], item: SITE + c[1] })) }).replace(/</g, "\\u003c")}</script>`;
+    } else if (url.pathname === "/") {
+      ld = `<script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "طبيبي (Tabeebi) demo", url: SITE, description: "Demo doctor booking platform. All doctors are fictional." }).replace(/</g, "\\u003c")}</script>`;
+    }
+    html = html.replace("<!--SEO-->", tags + ld);
     return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-cache" } });
   },
 };
