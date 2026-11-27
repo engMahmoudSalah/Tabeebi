@@ -1,4 +1,4 @@
-export const S = { lang: localStorage.tb_lang || "ar", theme: localStorage.tb_theme || "dark", token: localStorage.tb_token || "", user: JSON.parse(localStorage.tb_user || "null"), meta: null, unread: 0 };
+export const S = { lang: localStorage.tb_lang || "ar", theme: localStorage.tb_theme || "light", token: localStorage.tb_token || "", user: JSON.parse(localStorage.tb_user || "null"), meta: null, unread: 0 };
 export const T = (ar, en) => (S.lang === "ar" ? ar : en ?? ar);
 export const h = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 export const $ = (s, r = document) => r.querySelector(s);
