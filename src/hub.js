@@ -358,7 +358,7 @@ export class Hub extends DurableObject {
     const fee = kind === "online" ? d.online_fee : kind === "home" ? homeFee : d.fee;
     try { this.run(`INSERT INTO appointments VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)`, id, code, d.id, user.id, date, time, kind, d.user_id ? "booked" : "confirmed", name, phone, (kind === "home" ? "[زيارة منزلية] " + addr + (b.reason ? " | " : "") : "") + clean(b.reason, 300), fee, new Date().toISOString(), null); }
     catch { return err("الميعاد اتحجز من حد تاني، اختر ميعاد تاني", 409); }
-    this.notify(user.id, "تم تأكيد حجزك", `${d.name_ar} يوم ${date} الساعة ${time}. كود الحجز ${code}.`);
+    this.notify(user.id, "تم تأكيد حجزك", `${d.name_ar}\u2063${d.name_en || ""}\u2063 يوم ${date} الساعة ${time}. كود الحجز ${code}.`);
     this.notify(d.user_id, "حجز جديد", `${name} حجز ${date} ${time} (${kind === "online" ? "أونلاين" : kind === "home" ? "زيارة منزلية" : "عيادة"}).`);
     return J({ id, code, doctor: d.name_ar, doctor_en: d.name_en, date, time, kind, fee, address: d.address }, 201);
   }
