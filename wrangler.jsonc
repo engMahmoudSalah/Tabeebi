@@ -7,7 +7,7 @@
     "directory": "public",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    "run_worker_first": ["/api/*", "/sitemap.xml", "/robots.txt", "/", "/doctors", "/doctors/*", "/doctor/*", "/specialty/*", "/plans", "/for-doctors", "/by-mahmoud", "/book/*", "/account", "/account/*", "/admin", "/admin/*", "/login", "/register", "/join", "/about", "/faq"]
+    "run_worker_first": ["/*", "!/*.js", "!/*.css", "!/sites.json"]
   },
   "durable_objects": { "bindings": [{ "name": "HUB", "class_name": "Hub" }] },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Hub"] }],
