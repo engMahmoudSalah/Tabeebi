@@ -39,11 +39,18 @@ export const avatar = (d, cls = "") => { const k = d.hue % 4, sk = SKIN[k], hr =
 export const specName = (id) => { const s = S.meta?.specialties.find((x) => x.id === id); return s ? (S.lang === "ar" ? s.name_ar : s.name_en) : id; };
 export const dname = (d) => (S.lang === "ar" ? d.name_ar : d.name_en);
 
+export const cmpGet = () => { try { const a = JSON.parse(localStorage.tb_cmp || "[]"); return Array.isArray(a) ? a.filter((x) => typeof x === "string").slice(0, 3) : []; } catch { return []; } };
+export function updateCmpBar() {
+  let b = document.getElementById("cmpbar"); const l = cmpGet();
+  if (!l.length || location.pathname === "/compare") { if (b) b.remove(); return; }
+  if (!b) { b = document.createElement("div"); b.id = "cmpbar"; document.body.appendChild(b); }
+  b.innerHTML = `<span>${T("مقارنة", "Compare")}: <b>${num(l.length)}</b>/${num(3)}</span><a class="btn sm" href="/compare?d=${l.map(encodeURIComponent).join(",")}" data-link>${T("اعرض المقارنة", "View comparison")}</a><button type="button" class="btn ghost sm" data-cmpclear>${T("مسح", "Clear")}</button>`;
+}
 export function doctorCard(d) {
   return `<article class="dc"><button class="fav ${d.fav ? "on" : ""}" data-fav="${d.id}" aria-label="${T("حفظ", "Save")}">${ic("heart")}</button>
   <a class="dc-top" href="/doctor/${d.slug}" data-link>${avatar(d)}<div><h3>${h(dname(d))}</h3><div class="sub">${h(specName(d.spec))}${S.lang === "ar" ? " · " + h(d.title_ar) : ""}</div>
   <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">${stars(d.rating_avg)}<small style="color:var(--mute)">(${num(d.rating_count)})</small>${d.home_fee ? `<span class="badge warm">${T("زيارة منزلية", "Home visit")}</span>` : ""}${d.verified ? `<span class="badge">${ic("shield", "sm")}${T("ملف تجريبي", "Sample profile")}</span>` : ""}${d.featured ? `<span class="badge warm">${T("مميز", "Featured")}</span>` : ""}${d.online ? `<span class="badge lav">${ic("video", "sm")}${T("أونلاين", "Online")}</span>` : ""}</div></div></a>
-  <div class="meta"><span>${ic("pin", "sm")}${h(d.area)}، ${h(d.city)}</span><span>${ic("clock", "sm")}${T("انتظار " + num(d.waiting) + " د", "Wait " + d.waiting + " min")}</span></div>
+  <div class="meta"><span>${ic("pin", "sm")}${h(d.area)}، ${h(d.city)}</span><span>${ic("clock", "sm")}${T("انتظار " + num(d.waiting) + " د", "Wait " + d.waiting + " min")}</span><button class="cmp ${cmpGet().includes(d.slug) ? "on" : ""}" data-cmp="${d.slug}" type="button">${T("قارن", "Compare")}</button></div>
   <div class="dc-foot"><div><div class="price">${money(d.fee)} <small>${T("الكشف", "visit")}</small></div><div class="next">${d.next ? ic("cal", "sm") + nextLabel(d.next) : `<span style="color:var(--mute)">${T("لا مواعيد قريبة", "No upcoming slots")}</span>`}</div></div>
   <a class="btn sm" href="/doctor/${d.slug}#book" data-link>${T("احجز", "Book")}</a></div></article>`;
 }
@@ -60,7 +67,7 @@ export async function render() {
   if (!S.meta) { try { S.meta = await api("/meta"); } catch {} }
   document.documentElement.lang = S.lang; document.documentElement.dir = S.lang === "ar" ? "rtl" : "ltr"; document.documentElement.dataset.theme = S.theme;
   $("#hdr").innerHTML = header(path); $("#ftr").innerHTML = footer();
-  setTimeout(reveal, 60);
+  setTimeout(reveal, 60); setTimeout(updateCmpBar, 80);
   for (const [re, fn] of routes) { const m = path.match(re); if (m) { app.innerHTML = `<div class="wrap" style="padding-block:40px"><div class="grid"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div></div>`; try { await fn(app, m, new URLSearchParams(location.search)); } catch (e) { if (id === rendering) app.innerHTML = `<div class="wrap"><div class="empty">${ic("info")}<p>${h(e.message || "")}</p><a class="btn" style="margin-top:14px" href="/" data-link>${T("الرئيسية", "Home")}</a></div></div>`; } return; } }
   app.innerHTML = `<div class="wrap"><div class="empty">${ic("info")}<p>${T("الصفحة غير موجودة", "Page not found")}</p><a class="btn" style="margin-top:14px" href="/" data-link>${T("الرئيسية", "Home")}</a></div></div>`;
 }
@@ -94,6 +101,12 @@ document.addEventListener("click", async (e) => {
     if (k === "theme") { S.theme = S.theme === "dark" ? "light" : "dark"; localStorage.tb_theme = S.theme; render(); }
     if (k === "menu") $("#nav").classList.toggle("open");
   }
+  const cb = e.target.closest("[data-cmp]"); if (cb) {
+    e.preventDefault(); let l = cmpGet(); const sl = cb.dataset.cmp;
+    if (l.includes(sl)) l = l.filter((x) => x !== sl); else if (l.length >= 3) { toast(T("تقدر تقارن 3 أطباء بحد أقصى", "You can compare up to 3 doctors")); return; } else l.push(sl);
+    localStorage.tb_cmp = JSON.stringify(l); $$(`[data-cmp="${sl}"]`).forEach((x) => x.classList.toggle("on", l.includes(sl))); updateCmpBar(); return;
+  }
+  if (e.target.closest("[data-cmpclear]")) { localStorage.tb_cmp = "[]"; $$("[data-cmp]").forEach((x) => x.classList.remove("on")); updateCmpBar(); return; }
   const f = e.target.closest("[data-fav]"); if (f) {
     e.preventDefault(); if (!S.user) return nav("/login?next=" + encodeURIComponent(location.pathname));
     const on = f.classList.toggle("on"); try { await api("/favorites/" + f.dataset.fav, { method: on ? "POST" : "DELETE" }); toast(on ? T("اتحفظ في المفضلة", "Saved") : T("اتشال من المفضلة", "Removed")); } catch (er) { toast(er.message); }

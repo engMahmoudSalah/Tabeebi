@@ -8,6 +8,7 @@ const META = {
   "/for-doctors": ["للأطباء | اشتراكات طبيبي", "انضم كطبيب: جدول مواعيد ذكي، ملف احترافي، حجوزات أونلاين وباقات اشتراك مرنة."],
   "/plans": ["باقات الأطباء | طبيبي", "قارن باقات الأطباء المجانية والمدفوعة على طبيبي."],
   "/by-mahmoud": ["By Mahmoud — 23 Live Sites & Systems", "كل المواقع والأنظمة الحية التي بناها Mahmoud Salah."],
+  "/compare": ["مقارنة الأطباء | طبيبي", "قارن أطباء طبيبي التجريبيين جنب بعض."],
   "/faq": ["الأسئلة الشائعة | طبيبي", "إجابات عن الحجز والإلغاء والكشف أونلاين وباقات الأطباء."],
 };
 
@@ -43,7 +44,7 @@ export default {
     const shell = await env.ASSETS.fetch(new Request(url.origin + "/index.html"));
     let html = await shell.text();
     let [title, desc] = META[url.pathname] || ["طبيبي (نسخة تجريبية) | Tabeebi demo", META["/"][1]];
-    let noindex = /^\/(admin|account|login|register|join|book|doctor\/)/.test(url.pathname);
+    let noindex = /^\/(admin|account|login|register|join|book|compare|doctor\/)/.test(url.pathname);
     let notFound = !META[url.pathname] && !/^\/(admin|account|login|register|join|book|doctor\/|specialty\/)/.test(url.pathname);
     if (url.pathname.startsWith("/doctor/")) {
       try {

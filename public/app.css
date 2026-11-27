@@ -393,3 +393,8 @@ html,body{overflow-x:clip}
 .pstat b{font-size:28px;color:var(--brand);line-height:1.1}.pstat span{color:var(--mute);font-size:13px}
 @media(max-width:640px){.pdash{grid-template-columns:1fr 1fr 1fr}.pnext{grid-column:1/-1}}
 .row3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}@media(max-width:700px){.row3{grid-template-columns:1fr}}
+
+.cmp{border:1px solid var(--line);background:none;color:var(--mute);border-radius:99px;padding:3px 10px;font:inherit;font-size:12px;cursor:pointer;margin-inline-start:auto}
+.cmp.on{background:var(--brand-soft);color:var(--brand);border-color:var(--brand)}
+#cmpbar{position:fixed;inset-inline:12px;bottom:12px;z-index:50;display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 14px;max-width:520px;margin-inline:auto}
+.cmp-t th,.cmp-t td{white-space:nowrap}
