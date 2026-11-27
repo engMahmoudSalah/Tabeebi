@@ -244,7 +244,7 @@ export class Hub extends DurableObject {
       }
       if (path === "/doctor/apply" && m === "POST") { if (this.throttle("app" + (req.headers.get("cf-connecting-ip") || "x"), 5, 3600e3)) return err("محاولات كتير. جرب بعد شوية.", 429); } if (path === "/doctor/apply" && m === "POST") return await this.applyDoctor(body);
       // authenticated
-      if (path === "/me") { need(); if (m === "PATCH") { const n = clean(body.name, 80), p = clean(body.phone, 20); if (n.length < 2) return err("الاسم قصير"); this.run(`UPDATE users SET name=?, phone=? WHERE id=?`, n, p, user.id); } return J({ user: this.one(`SELECT id,name,email,phone,role FROM users WHERE id=?`, user.id) }); }
+      if (path === "/me") { need(); if (m === "PATCH") { const n = clean(body.name, 80), p = clean(body.phone, 20); if (n.length < 2) return err("الاسم قصير"); if (p && !/^\+?[0-9 ()-]{8,20}$/.test(p)) return err("اكتب رقم موبايل صحيح"); this.run(`UPDATE users SET name=?, phone=? WHERE id=?`, n, p, user.id); } return J({ user: this.one(`SELECT id,name,email,phone,role FROM users WHERE id=?`, user.id) }); }
       if (path === "/me/password" && m === "POST") {
         need(); const k = "pw" + user.id; const at = this.attempts.get(k) || { n: 0, t: Date.now() };
         if (Date.now() - at.t > 10 * 60e3) { at.n = 0; at.t = Date.now(); }
