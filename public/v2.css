@@ -97,3 +97,12 @@ section.s{padding-block:54px}
 .filters{border-radius:28px}
 .chip{border-radius:999px}
 @media(max-width:700px){.prof>div>.box:first-child .prof-head{align-items:center;justify-content:center;text-align:center}.prof>div>.box:first-child .prof-head>div{padding-top:0}.prof>div>.box:first-child .prof-head>div>div{justify-content:center}.kv{grid-template-columns:repeat(3,1fr)}.kv div{padding:10px;font-size:12px}.kv b{font-size:16px}}
+/* slice 3: auth pages + dark polish */
+.auth>.steth{display:none}
+.auth{max-width:440px}
+.auth::before{content:"";position:absolute;inset-inline-start:-200px;top:10px;width:150px;height:190px;border-radius:999px 999px 24px 24px;background:radial-gradient(circle at 50% 28%,var(--sun) 0 22px,transparent 23px),radial-gradient(ellipse 90% 30% at 30% 104%,var(--mint) 0 97%,transparent),linear-gradient(180deg,var(--lav-soft),var(--brand-soft));z-index:0}
+.auth::after{content:"";position:absolute;inset-inline-end:-150px;bottom:60px;width:110px;height:110px;border-radius:50%;background:var(--warm-soft);z-index:0}
+@media(max-width:1000px){.auth::before,.auth::after{display:none}}
+.auth>.box{border-radius:36px;padding:30px}
+.in,.form .in,input.in,select.in,textarea.in{border-radius:16px}
+[data-theme=dark] .prof>div>.box:first-child{background:linear-gradient(115deg,#25397a,#3a2f78 55%,#4a4020) top/100% 104px no-repeat,var(--card)}
