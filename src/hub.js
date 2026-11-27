@@ -499,7 +499,7 @@ export class Hub extends DurableObject {
     }
     if (p === "users") return J(this.q(`SELECT id,name,email,phone,role,created_at FROM users ORDER BY created_at DESC LIMIT 200`));
     if (p === "appointments") return J(this.q(`SELECT a.*, d.name_ar dname, d.name_en dname_en FROM appointments a JOIN doctors d ON d.id=a.doctor_id ORDER BY a.created_at DESC LIMIT 200`));
-    if (p === "subscriptions") return J(this.q(`SELECT s.*, d.name_ar dname FROM subscriptions s JOIN doctors d ON d.id=s.doctor_id WHERE s.status IN ('requested','active') AND s.note<>'seed' ORDER BY s.created_at DESC LIMIT 100`));
+    if (p === "subscriptions") return J(this.q(`SELECT s.*, d.name_ar dname, d.name_en dname_en FROM subscriptions s JOIN doctors d ON d.id=s.doctor_id WHERE s.status IN ('requested','active') AND s.note<>'seed' ORDER BY s.created_at DESC LIMIT 100`));
     if ((x = p.match(/^subscriptions\/(\w+)\/(approve|reject)$/)) && m === "POST") {
       const s = this.one(`SELECT * FROM subscriptions WHERE id=?`, x[1]); if (!s) return err("غير موجود", 404);
       const d = this.one(`SELECT * FROM doctors WHERE id=?`, s.doctor_id);
