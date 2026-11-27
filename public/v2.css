@@ -68,3 +68,5 @@ section.s{padding-block:54px}
 .band:has(.stats) .stats>div{background:transparent!important;border:0!important}
 .cta p,.cta small,.cta div{color:inherit}
 .cta p{color:inherit!important;opacity:.92}
+.cta::after{opacity:.14;z-index:0;pointer-events:none}
+.cta>*{position:relative;z-index:1}
