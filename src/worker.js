@@ -28,17 +28,19 @@ export default {
   async handle(request, env) {
     const url = new URL(request.url);
     if (url.pathname.startsWith("/api/")) {
-      const id = env.HUB.idFromName("main");
-      return env.HUB.get(id).fetch(request);
+      try { const id = env.HUB.idFromName("main"); return await env.HUB.get(id).fetch(request); }
+      catch { return new Response(JSON.stringify({ error: "الخدمة مشغولة مؤقتا (حد الاستخدام اليومي للنسخة التجريبية). جرّب بعد شوية. / Service is temporarily busy (daily demo limit). Please try again later.", busy: true }), { status: 503, headers: { "content-type": "application/json", "retry-after": "3600" } }); }
     }
     if (url.pathname === "/robots.txt") return new Response(`User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /account\nDisallow: /api/\nSitemap: ${SITE}/sitemap.xml\n`, { headers: { "content-type": "text/plain" } });
     if (url.pathname === "/sitemap.xml") {
+      try {
       const id = env.HUB.idFromName("main");
       const r = await env.HUB.get(id).fetch(new Request(SITE + "/api/slugs"));
       const slugs = await r.json();
       const sp = await (await env.HUB.get(env.HUB.idFromName("main")).fetch(new Request(SITE + "/api/meta"))).json();
       const urls = ["/", ...sp.specialties.map((s) => "/specialty/" + s.id), "/doctors", "/for-doctors", "/plans", "/faq", "/by-mahmoud"];
       return new Response(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map((u) => `<url><loc>${SITE}${u}</loc></url>`).join("")}</urlset>`, { headers: { "content-type": "application/xml" } });
+      } catch { return new Response("temporarily unavailable", { status: 503, headers: { "retry-after": "3600" } }); }
     }
     // SPA shell with per-route meta
     const shell = await env.ASSETS.fetch(new Request(url.origin + "/index.html"));
