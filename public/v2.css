@@ -71,3 +71,29 @@ section.s{padding-block:54px}
 .cta::after{opacity:.14;z-index:0;pointer-events:none}
 .cta>*{position:relative;z-index:1}
 .cta::after{display:none!important}
+/* slice 2: doctor profile, cards, booking */
+.demo-card{background:var(--sun-soft);color:var(--ink);border:0;border-radius:20px;padding:10px 18px}
+.demo-card b{color:var(--warm)}
+.prof{gap:22px}
+.box{border-radius:30px;padding:24px}
+.box h2::before{content:"";display:inline-block;width:11px;height:11px;border-radius:50%;background:var(--brand);margin-inline-end:10px}
+.box:nth-child(3n+2) h2::before{background:var(--warm)}.box:nth-child(3n) h2::before{background:var(--mint)}
+.prof>div>.box:first-child{padding-top:58px;background:linear-gradient(115deg,var(--brand-soft),var(--lav-soft) 55%,var(--sun-soft)) top/100% 104px no-repeat,var(--card)}
+.prof>div>.box:first-child .prof-head{align-items:flex-end}
+.prof>div>.box:first-child .av{margin-top:-46px;border:5px solid var(--card)}
+.prof>div>.box:first-child .prof-head>div{padding-top:50px}
+.kv div{border-radius:20px;padding:14px 16px;background:var(--brand-soft);color:var(--ink)}
+.kv div:nth-child(3n+2){background:var(--sun-soft)}.kv div:nth-child(3n){background:var(--mint-soft)}
+.kv b{font-family:var(--font-h);font-size:20px}
+.book{border:2px solid var(--brand-soft);border-radius:32px}
+.day{border-radius:22px;width:68px}
+.slot{border-radius:999px}
+.slot:hover{background:var(--brand-soft)}
+.dc{border:0;background:var(--card);outline:1px solid var(--line);outline-offset:-1px;padding:20px}
+.dc:hover{outline-color:var(--brand);transform:translateY(-3px)}
+.dc-foot{border-top:0;background:var(--card2);margin:0 -8px -8px;padding:12px 14px;border-radius:20px}
+.av{border:3px solid var(--card)}
+.badge{padding:4px 11px}
+.filters{border-radius:28px}
+.chip{border-radius:999px}
+@media(max-width:700px){.prof>div>.box:first-child .prof-head{align-items:center;justify-content:center;text-align:center}.prof>div>.box:first-child .prof-head>div{padding-top:0}.prof>div>.box:first-child .prof-head>div>div{justify-content:center}.kv{grid-template-columns:repeat(3,1fr)}.kv div{padding:10px;font-size:12px}.kv b{font-size:16px}}
