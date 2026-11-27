@@ -1,0 +1,70 @@
+/* Tabeebi v2: "Lagoon & Blush" identity. Soft cobalt, coral, sun, mint. Loaded after app.css. */
+:root,[data-theme=dark]{--font-h:"Baloo Bhaijaan 2","Readex Pro",system-ui,sans-serif;--bg:#0d1324;--bg2:#131b33;--card:#172140;--card2:#1d2a4d;--line:#27345c;--ink:#eaeffc;--mute:#9dabcc;--brand:#8aa9ff;--brand-ink:#071238;--brand-soft:#1b2b5e;--warm:#ff9d88;--warm-soft:#3b2326;--warm-ink:#2b0f0a;--lav:#bda6ff;--lav-soft:#2b2354;--sun:#ffd36e;--sun-soft:#3a3118;--mint:#6fe0bd;--mint-soft:#133a33;--danger:#ff8c7d;--ok:#6fe0bd;--hero-a:#1a2a5c;--hero-b:#0d1324}
+[data-theme=light]{--bg:#f5f7fb;--bg2:#e9effa;--card:#ffffff;--card2:#eff3fb;--line:#dce4f1;--ink:#15203a;--mute:#566580;--brand:#2757d8;--brand-ink:#ffffff;--brand-soft:#dde7ff;--warm:#c4412b;--warm-soft:#ffe2da;--warm-ink:#ffffff;--lav:#6d43c4;--lav-soft:#ebe3fb;--sun:#f2b632;--sun-soft:#fff0c6;--mint:#14906f;--mint-soft:#d4f2e6;--danger:#c0392b;--ok:#14906f;--hero-a:#dde7ff;--hero-b:#f5f7fb}
+:root{--r:24px;--r-s:14px}
+h1,h2,h3,.logo,.step .n,.stats b,.s-head h2{font-family:var(--font-h)}
+h1{font-weight:800;letter-spacing:-.01em;line-height:1.25}
+h2,h3{font-weight:700}
+/* floating pill header */
+.hdr{top:0;background:transparent;backdrop-filter:none;border:0;padding-bottom:6px}
+.demo-top{width:fit-content;max-width:100%;margin:0 auto;border:1px solid var(--line);border-top:0;border-radius:0 0 14px 14px;padding:4px 16px;background:var(--sun-soft);color:var(--ink)}
+.hdr .wrap{margin-top:8px;height:60px;max-width:calc(var(--maxw) - 24px);background:color-mix(in srgb,var(--card) 90%,transparent);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:999px;padding-inline:14px}
+.nav a.on{background:var(--brand-soft);color:var(--brand)}
+.logo svg{width:36px;height:36px}
+/* hero: arch window scene */
+.hero{background:radial-gradient(700px 420px at 90% 0,var(--hero-a),transparent 70%),radial-gradient(500px 300px at 0 100%,var(--mint-soft),transparent 70%),var(--bg);border-bottom:0}
+.hero::before,.hero::after{display:none}
+.hero .wrap{padding-block:42px 64px}
+.eyebrow{background:var(--sun-soft);color:var(--ink)}
+.eyebrow i{background:var(--warm)}
+h1 em{color:var(--brand)}
+h1 em svg{stroke:var(--warm)}
+.search{border-radius:32px;border-color:var(--line)}
+.field{border-radius:999px;background:var(--card2)}
+.sgrid .btn{border-radius:999px}
+.tab.on{background:var(--brand);color:var(--brand-ink)}
+@media(min-width:981px){.hero .wrap{grid-template-columns:1.05fr .95fr;gap:24px}}
+.hero-art{height:470px}
+.helix{display:none}
+.hero-art .blob{inset:0 70px;border:0;animation:none;border-radius:999px 999px 36px 36px;background:radial-gradient(circle at 30% 20%,var(--sun) 0 40px,transparent 41px),radial-gradient(ellipse 85% 34% at 22% 104%,var(--mint) 0 97%,transparent 100%),radial-gradient(ellipse 75% 30% at 92% 106%,var(--brand) 0 97%,transparent 100%),linear-gradient(180deg,var(--lav-soft),var(--brand-soft))}
+.hero-art .blob::after{content:"";position:absolute;inset-inline:0;top:44%;margin-inline:auto;width:76px;height:76px;border-radius:50%;background:linear-gradient(#fff,#fff) center/9px 44% no-repeat,linear-gradient(#fff,#fff) center/44% 9px no-repeat,var(--warm)}
+.ticket{border-radius:22px;border-color:var(--line)}
+/* sections */
+section.s{padding-block:54px}
+.s-head h2{font-size:clamp(28px,3.6vw,40px)}
+.specs{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.spec{border:0;border-radius:30px 30px 30px 10px;padding:22px 12px;gap:12px;background:var(--brand-soft)}
+[dir=ltr] .spec{border-radius:30px 30px 10px 30px}
+.spec:nth-child(5n+2){background:var(--warm-soft)}
+.spec:nth-child(5n+3){background:var(--sun-soft)}
+.spec:nth-child(5n+4){background:var(--mint-soft)}
+.spec:nth-child(5n+5){background:var(--lav-soft)}
+.spec .si,.spec:nth-child(3n+2) .si,.spec:nth-child(3n) .si{width:56px;height:56px;border-radius:50%;background:var(--card);color:var(--ink)}
+.spec:nth-child(5n+1) .si{color:var(--brand)}.spec:nth-child(5n+2) .si{color:var(--warm)}.spec:nth-child(5n+3) .si{color:#9a6a00}.spec:nth-child(5n+4) .si{color:var(--mint)}.spec:nth-child(5n+5) .si{color:var(--lav)}
+[data-theme=dark] .spec:nth-child(5n+3) .si{color:var(--sun)}
+.spec small{color:var(--ink);opacity:.7}
+.spec:hover{transform:translateY(-4px) rotate(-1deg)}
+.band{background:var(--bg2);border:0;border-radius:44px;margin-inline:12px}
+.s.band .grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding-bottom:12px;scrollbar-width:thin}
+.s.band .grid>.dc{flex:0 0 min(350px,84%);scroll-snap-align:start}
+.dc{border-radius:28px}
+.steps{gap:16px}
+.step{border:0;background:var(--card);border-radius:30px;padding:26px 24px}
+.step:nth-child(2){background:var(--sun-soft)}.step:nth-child(3){background:var(--mint-soft)}
+.step .n{-webkit-text-stroke:0;color:var(--brand);font-size:54px;opacity:.9}
+.step:nth-child(2) .n{color:var(--warm)}.step:nth-child(3) .n{color:var(--mint)}
+.band:has(.stats){background:var(--brand);color:var(--brand-ink)}
+.band:has(.stats) .stats b{color:var(--brand-ink)}.band:has(.stats) .stats span{color:var(--brand-ink);opacity:.82}
+.cta{background:var(--warm);color:var(--warm-ink);border:0;border-radius:44px;padding:48px}
+.cta::after{border-color:var(--warm-ink)}
+.cta .eyebrow{background:color-mix(in srgb,var(--warm-ink) 16%,transparent);color:var(--warm-ink)}
+.cta .btn{background:var(--card);color:var(--ink)}
+.cta .btn.ghost{background:transparent;color:var(--warm-ink);border-color:color-mix(in srgb,var(--warm-ink) 55%,transparent)}
+.btn.warm{color:var(--warm-ink)}
+.ftr{background:var(--bg2);border:0;border-radius:44px 44px 0 0;margin-inline:12px}
+.ftr-me{border-color:var(--line)}
+@media(max-width:980px){.nav{top:78px;margin-inline:10px;border:1px solid var(--line);border-radius:26px;padding:10px}.hero-art{height:400px}.hero-art .blob{inset:0 30px}.band,.ftr{margin-inline:6px;border-radius:32px}.ftr{border-radius:32px 32px 0 0}}
+@media(max-width:560px){.hdr .wrap{margin-inline:8px;width:auto}.specs{grid-template-columns:repeat(2,1fr)}.cta{padding:30px 22px;border-radius:32px}.step{padding:22px}}
+.band:has(.stats) .stats>div{background:transparent!important;border:0!important}
+.cta p,.cta small,.cta div{color:inherit}
+.cta p{color:inherit!important;opacity:.92}
