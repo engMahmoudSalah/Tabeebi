@@ -73,6 +73,7 @@ export default {
       ld = `<script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "طبيبي (Tabeebi) demo", url: SITE, description: "Demo doctor booking platform. All doctors are fictional." }).replace(/</g, "\\u003c")}</script>`;
     }
     html = html.replace("<!--SEO-->", tags + ld);
+    if (url.pathname !== "/") html = html.replace(/<h1>[^<]*<\/h1>/, `<h1>${esc(title.split("|")[0].trim())}</h1>`);
     return new Response(html, { status: notFound ? 404 : 200, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-cache" } });
   },
 };
