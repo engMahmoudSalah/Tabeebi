@@ -70,3 +70,4 @@ section.s{padding-block:54px}
 .cta p{color:inherit!important;opacity:.92}
 .cta::after{opacity:.14;z-index:0;pointer-events:none}
 .cta>*{position:relative;z-index:1}
+.cta::after{display:none!important}
