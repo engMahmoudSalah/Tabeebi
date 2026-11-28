@@ -165,3 +165,15 @@ section.s:has(.cta)>.wrap{max-width:none;padding:0}
 @media(max-width:700px){#res .dc{grid-template-columns:1fr}#res .dc .dc-foot{flex-direction:row;align-items:center}}
 .step:first-child{border-top:3px solid var(--brand)}
 @media(min-width:701px){#res .dc>*{grid-column:1}#res .dc>.dc-foot{grid-column:2;grid-row:1/span 4;align-self:center}}
+/* slice 6: plans as open comparison columns, arch scene for plans hero */
+.plans{gap:0;align-items:stretch}
+.plan,.plan.hot{background:transparent;border:0;border-radius:0;padding:28px 28px;border-inline-start:1px solid var(--line);transform:none!important}
+.plan:first-child{border-inline-start:0}
+.plan.hot{background:linear-gradient(180deg,var(--brand-soft),transparent 70%);border-radius:28px 28px 0 0;border-inline-start:0}
+.plan .ribbon{color:var(--warm-ink);inset-inline-start:28px;top:-13px}
+.plan .p{font-family:var(--font-h)}
+@media(max-width:980px){.plan,.plan.hot{border-inline-start:0;border-top:1px solid var(--line);border-radius:0}.plan.hot{border-radius:24px}}
+.caps>*{display:none!important}
+.caps{height:300px;margin-top:-150px;width:240px}
+.caps::before{content:"";position:absolute;inset:0;border-radius:999px 999px 30px 30px;background:radial-gradient(circle at 70% 22%,var(--sun) 0 36px,transparent 37px),radial-gradient(ellipse 85% 30% at 25% 104%,var(--mint) 0 97%,transparent),radial-gradient(ellipse 75% 28% at 95% 106%,var(--brand) 0 97%,transparent),linear-gradient(180deg,var(--lav-soft),var(--brand-soft))}
+.caps::after{content:"";position:absolute;inset-inline:0;top:46%;margin-inline:auto;width:70px;height:70px;border-radius:50%;background:linear-gradient(#fff,#fff) center/8px 44% no-repeat,linear-gradient(#fff,#fff) center/44% 8px no-repeat,var(--warm)}
