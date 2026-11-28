@@ -177,3 +177,15 @@ section.s:has(.cta)>.wrap{max-width:none;padding:0}
 .caps{height:300px;margin-top:-150px;width:240px}
 .caps::before{content:"";position:absolute;inset:0;border-radius:999px 999px 30px 30px;background:radial-gradient(circle at 70% 22%,var(--sun) 0 36px,transparent 37px),radial-gradient(ellipse 85% 30% at 25% 104%,var(--mint) 0 97%,transparent),radial-gradient(ellipse 75% 28% at 95% 106%,var(--brand) 0 97%,transparent),linear-gradient(180deg,var(--lav-soft),var(--brand-soft))}
 .caps::after{content:"";position:absolute;inset-inline:0;top:46%;margin-inline:auto;width:70px;height:70px;border-radius:50%;background:linear-gradient(#fff,#fff) center/8px 44% no-repeat,linear-gradient(#fff,#fff) center/44% 8px no-repeat,var(--warm)}
+/* slice 7: doctor rows */
+@media(min-width:701px){
+#res .dc{grid-template-columns:1fr 250px;grid-template-rows:auto auto;gap:6px 30px;padding:22px 6px}
+#res .dc>.dc-top{grid-row:1}#res .dc>.meta{grid-row:2}
+#res .dc>.dc-foot{grid-column:2;grid-row:1/span 2;flex-direction:column;align-items:stretch;gap:10px;border-inline-start:1px solid var(--line);padding-inline-start:26px}
+#res .dc>.dc-foot>div{display:flex;flex-direction:column;gap:2px}
+#res .dc>.dc-foot .price{font-family:var(--font-h);font-size:24px;line-height:1.2}
+#res .dc>.dc-foot .btn{width:100%}
+#res .dc .fav{inset-inline-end:4px;top:22px}
+}
+#res .dc .meta{gap:14px;flex-wrap:wrap;align-items:center}
+#res .dc h3{font-family:var(--font-h);font-size:19px}
