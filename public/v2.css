@@ -211,3 +211,11 @@ section.s:has(.cta)>.wrap{max-width:none;padding:0}
 .kpi:nth-child(2){border-color:var(--warm)}.kpi:nth-child(3){border-color:var(--mint)}.kpi:nth-child(4){border-color:var(--lav)}
 .kpi:hover{transform:none}.kpi b{font-family:var(--font-h);font-size:32px}
 .cards4{gap:20px}
+/* slice 9: booking stepper */
+.steps3{list-style:none;display:flex;align-items:center;gap:0;margin:18px 0 6px}
+.steps3 li{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--mute);flex:1}
+.steps3 li+li::before{content:"";flex:1;height:2px;background:var(--line);margin-inline:10px;order:-1}
+.steps3 li i{font-style:normal;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--bg2);color:var(--mute);font-weight:700;font-size:13px;flex:none}
+.steps3 li.done i{background:var(--mint);color:#fff}.steps3 li.done::before{background:var(--mint)!important}
+.steps3 li.on{color:var(--ink);font-weight:600}.steps3 li.on i{background:var(--brand);color:var(--brand-ink)}.steps3 li.on::before{background:var(--brand)!important}
+.steps3 li:first-child{flex:none}.steps3 li:not(:first-child){flex:1}
