@@ -189,3 +189,25 @@ section.s:has(.cta)>.wrap{max-width:none;padding:0}
 }
 #res .dc .meta{gap:14px;flex-wrap:wrap;align-items:center}
 #res .dc h3{font-family:var(--font-h);font-size:19px}
+/* slice 8: account and dashboards, open style */
+.side{background:transparent;border:0;border-radius:0;padding:0;border-inline-end:1px solid var(--line);padding-inline-end:14px}
+.side a,.side button{border-radius:0 999px 999px 0;border-inline-start:3px solid transparent;padding:11px 14px}
+[dir=rtl] .side a,[dir=rtl] .side button{border-radius:999px 0 0 999px}
+.side a:hover,.side a.on{background:transparent}
+.side a.on{border-inline-start-color:var(--brand);font-weight:600;background:linear-gradient(90deg,transparent,var(--brand-soft))}
+[dir=rtl] .side a.on{background:linear-gradient(270deg,transparent,var(--brand-soft))}
+@media(max-width:980px){.side{border:0;padding:0}.side a,.side button{border-radius:999px;border-inline-start:0}.side a.on{background:var(--brand-soft)}[dir=rtl] .side a.on{background:var(--brand-soft)}}
+.pdash{gap:0;margin-bottom:30px;align-items:stretch}
+.pnext{background:linear-gradient(115deg,var(--brand-soft),var(--sun-soft));border:0;border-radius:28px;margin-inline-end:18px}
+.pstat{background:transparent;border:0;border-radius:0;border-inline-start:1px solid var(--line)}
+.pstat b{font-family:var(--font-h);font-size:32px}
+.pstat:nth-child(3){color:var(--ink)}
+.pstat:nth-child(2) b{color:var(--warm)}.pstat:nth-child(4) b{color:var(--mint)}
+@media(max-width:640px){.pnext{margin-inline-end:0;margin-bottom:12px}.pstat{border-inline-start:0;border-top:0}}
+.apt{background:transparent;border:0;border-radius:0;border-bottom:1px solid var(--line);padding:18px 4px;margin:0}
+.apt .date{border-radius:20px;background:var(--brand-soft)}
+.empty{border:0;border-radius:0;padding:44px 20px}
+.kpi{background:transparent;border:0;border-radius:0;border-top:3px solid var(--brand);padding:14px 6px 0}
+.kpi:nth-child(2){border-color:var(--warm)}.kpi:nth-child(3){border-color:var(--mint)}.kpi:nth-child(4){border-color:var(--lav)}
+.kpi:hover{transform:none}.kpi b{font-family:var(--font-h);font-size:32px}
+.cards4{gap:20px}
